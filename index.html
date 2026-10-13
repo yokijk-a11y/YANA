@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#176b52">
+  <meta name="description" content="YANA — tempat iklan masyarakat Indonesia. Jual barang, tawarkan jasa, cari pekerjaan, dan temukan berbagai kesempatan.">
+  <meta property="og:title" content="YANA — Iklan Gratis untuk Semua">
+  <meta property="og:description" content="Jual barang, tawarkan jasa, cari pekerjaan. Pasang iklan gratis 30 hari.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="id_ID">
+  <meta name="twitter:card" content="summary">
+  <!-- Setelah punya domain, tambahkan juga: <meta property="og:url" content="https://DOMAINMU/"> dan <meta property="og:image" content="https://DOMAINMU/og.png"> (gambar 1200x630) agar preview di WhatsApp lebih menarik. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2722%27 fill=%27%23176b52%27/%3E%3Ctext x=%2750%27 y=%2772%27 font-size=%2765%27 font-weight=%27900%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3EY%3C/text%3E%3C/svg%3E">
+  <title>YANA — Iklan Gratis untuk Semua</title>
+  <style>
+    :root{--green:#176b52;--green-dark:#10533f;--mint:#eaf5ef;--ink:#17231e;--muted:#68756e;--line:#e3eae5;--paper:#f7f9f7;--white:#fff;--orange:#f6a84a;--metal:linear-gradient(135deg,#0d553f 0%,#1d8a68 26%,#0f5f47 50%,#25946f 74%,#0d553f 100%);--metal-dark:linear-gradient(90deg,#0a4030,#14664e 50%,#0a4030)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    a{color:inherit;text-decoration:none}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .topbar{background:var(--metal-dark);color:#eaf6ef;text-align:center;padding:8px 14px;font-size:12px}
+    header{background:var(--white);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+    .nav{max-width:1160px;margin:auto;padding:14px 20px;display:flex;align-items:center;gap:22px}
+    .brand{display:flex;align-items:center;gap:9px;min-width:140px}
+    .logo{width:42px;height:42px;border-radius:13px;background:var(--metal);color:white;display:grid;place-items:center;font-size:22px;font-weight:900;text-shadow:0 1px 2px #0a3a2a88;box-shadow:inset 0 1px 0 #ffffff66,inset 0 -2px 3px #00000030,0 5px 14px #176b5240;position:relative;overflow:hidden}
+    .brand-name{font-size:25px;font-weight:900;letter-spacing:1.2px;color:var(--green);line-height:1}
+    .brand-tag{font-size:10px;color:var(--muted);margin-top:4px}
+    .search{display:flex;flex:1;gap:8px;min-width:0}
+    .search input{width:100%;min-width:0;border:1px solid #dce5de;border-radius:11px;padding:12px 14px;outline:none;background:#fbfdfb}
+    .search input:focus,.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px #176b5217}
+    .btn{border:0;border-radius:10px;padding:11px 16px;font-weight:750;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:.18s}
+    .btn-primary{background:var(--metal);color:white;position:relative;overflow:hidden;text-shadow:0 1px 1px #0a3a2a66;box-shadow:inset 0 1px 0 #ffffff44,inset 0 -1px 0 #00000022,0 4px 12px #176b5233}
+    .btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+    .btn-primary::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,#ffffff55 50%,transparent 65%);transform:translateX(-120%);transition:transform .6s;pointer-events:none}
+    .btn-primary:hover::after{transform:translateX(120%)}
+    .btn-light{background:var(--mint);color:var(--green)}
+    .btn-outline{background:white;border:1px solid var(--line);color:var(--ink)}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .wrap{max-width:1160px;margin:auto;padding:28px 20px}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:17px}
+    h2{font-size:22px;margin:0;letter-spacing:-.4px}
+    .sub{color:var(--muted);font-size:13px;margin-top:5px}
+    .categories{display:grid;grid-template-columns:repeat(8,1fr);gap:12px}
+    .cat{border:1px solid var(--line);background:white;border-radius:15px;padding:17px 8px;text-align:center;transition:.18s}
+    .cat:hover,.cat.active{border-color:#9bc9ac;background:#f0f8f2;transform:translateY(-2px)}
+    .cat-icon{width:48px;height:48px;background:var(--mint);border-radius:14px;display:grid;place-items:center;font-size:24px;margin:0 auto 9px}
+    .cat span:last-child{font-size:12px;font-weight:750}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:18px 0}
+    .toolbar select{border:1px solid var(--line);background:white;padding:10px 12px;border-radius:10px;color:#405047}
+    .result-count{font-size:13px;color:var(--muted);margin-left:auto}
+    .listings{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+    .listing{background:white;border:1px solid var(--line);border-radius:15px;overflow:hidden;transition:.2s;min-width:0}
+    .listing:hover{transform:translateY(-3px);box-shadow:0 10px 24px #183d2910}
+    .listing-img{height:155px;display:grid;place-items:center;font-size:57px;background:linear-gradient(135deg,#edf5ef,#f9f5e9);position:relative}
+    .badge{position:absolute;left:10px;top:10px;background:white;color:var(--green);border-radius:6px;padding:5px 7px;font-size:10px;font-weight:800}
+    .listing-body{padding:13px}
+    .listing-title{font-size:14px;font-weight:750;line-height:1.4;min-height:39px;margin-bottom:7px}
+    .price{font-size:17px;font-weight:900;color:var(--green);margin-bottom:9px}
+    .listing-meta{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:5px}
+    .empty{grid-column:1/-1;text-align:center;padding:45px 20px;border:1px dashed #cbd8ce;border-radius:15px;background:white;color:var(--muted)}
+    .empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:6px}
+    .how{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+    .how-card{padding:20px;background:white;border:1px solid var(--line);border-radius:15px}
+    .how-icon{font-size:26px;margin-bottom:9px}
+    .how-card h3{margin:0 0 7px;font-size:16px}
+    .how-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+    .cta{background:var(--green);color:white;border-radius:18px;padding:25px 28px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+    .cta h2{font-size:23px}.cta p{margin:7px 0 0;color:#d5e9de;font-size:13px}
+    .cta .btn{background:white;color:var(--green);white-space:nowrap}
+    footer{background:linear-gradient(160deg,#0f3326,#14402f 50%,#0c2a20);color:#dce9e1;margin-top:30px}
+    .footer-inner{max-width:1160px;margin:auto;padding:28px 20px;display:flex;justify-content:space-between;gap:20px;align-items:center}
+    .footer-note{font-size:12px;color:#afc4b7;line-height:1.6;max-width:560px}
+    .footer-brand{font-size:23px;font-weight:900;letter-spacing:1px}
+    .footer-bottom{border-top:1px solid #ffffff20;text-align:center;padding:13px;font-size:11px;color:#afc4b7}
+    .modal{position:fixed;inset:0;background:#0b2119a8;z-index:30;display:none;align-items:center;justify-content:center;padding:18px}
+    .modal.open{display:flex}
+    .modal-box{width:min(560px,100%);max-height:92vh;max-height:92dvh;overflow:auto;background:white;border-radius:18px;padding:22px;box-shadow:0 25px 70px #0003}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:7px}
+    .modal-head h2{font-size:22px}
+    .close{border:0;background:#f0f4f1;width:36px;height:36px;border-radius:50%;font-size:21px}
+    .notice{background:#fff5df;color:#76541b;padding:11px 12px;border-radius:10px;font-size:12px;line-height:1.55;margin:12px 0 17px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+    .field{display:flex;flex-direction:column;gap:6px;min-width:0}
+    .field.full{grid-column:1/-1}
+    .field label{font-size:12px;font-weight:800;color:#3b4b41}
+    .field input,.field select,.field textarea{width:100%;border:1px solid #dce5de;border-radius:9px;padding:11px 12px;outline:none;background:#fff}
+    .field textarea{min-height:82px;resize:vertical}
+    .form-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
+    .toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,20px);background:#183d2d;color:white;padding:12px 18px;border-radius:10px;font-size:13px;box-shadow:0 8px 25px #0002;opacity:0;pointer-events:none;transition:.2s;z-index:50;max-width:calc(100% - 30px);text-align:center}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .disclaimer{font-size:11px;color:var(--muted);text-align:center;margin-top:15px}
+    @media(max-width:900px){.categories{grid-template-columns:repeat(4,1fr)}.listings{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:650px){.nav{padding:11px 14px;gap:10px;flex-wrap:wrap}.brand{min-width:0;flex:1}.brand-name{font-size:23px}.search{order:3;flex-basis:100%}.nav>.btn{padding:10px 12px;font-size:12px}.wrap{padding:24px 15px}.categories{grid-template-columns:repeat(4,1fr);gap:8px}.cat{padding:12px 4px}.cat-icon{width:42px;height:42px;font-size:22px}.cat span:last-child{font-size:11px}.listings{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.listing-img{height:125px;font-size:48px}.listing-body{padding:10px}.listing-title{font-size:13px}.price{font-size:15px}.how{grid-template-columns:1fr}.cta{padding:22px;align-items:flex-start;flex-direction:column}.footer-inner{align-items:flex-start;flex-direction:column}.result-count{width:100%;margin-left:0}.section-head{align-items:flex-start;flex-direction:column}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
+    .skel{height:250px;border-radius:15px;background:linear-gradient(90deg,#eef2ef 25%,#f8faf8 50%,#eef2ef 75%);background-size:200% 100%;animation:sh 1.2s infinite}
+    @keyframes sh{to{background-position:-200% 0}}
+    .more{display:flex;justify-content:center;margin-top:18px}
+    .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+    .count{font-size:11px;color:var(--muted);text-align:right}
+    .d-meta{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+    .chip{background:var(--mint);color:var(--green);border-radius:20px;padding:5px 10px;font-size:12px;font-weight:700}
+    .d-desc{white-space:pre-wrap;line-height:1.65;font-size:14px;color:#33443a;margin:0 0 6px;overflow-wrap:anywhere}
+    .report{display:flex;gap:6px;flex-wrap:wrap}.report select{border:1px solid var(--line);border-radius:9px;padding:9px;font-size:12px;background:#fff}
+    .btn:focus-visible,.cat:focus-visible,.close:focus-visible{outline:3px solid #176b5240;outline-offset:2px}
+    .listing-body .btn{width:100%;margin-top:12px;font-size:12px}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+    .cat-top{padding-top:20px;padding-bottom:10px}
+    .cat{display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
+    .cat span:last-child{min-height:2.6em;display:flex;align-items:flex-start;justify-content:center;line-height:1.3}
+    @media(max-width:650px){.topbar{display:none}.hero-actions .btn{padding:10px 14px;font-size:13px}.cat-top{padding-top:14px}}
+    .carousel{max-width:1160px;margin:0 auto;padding:6px 20px 0}
+    .slides{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:20px}
+    .slides::-webkit-scrollbar{display:none}
+    .slide{flex:0 0 100%;scroll-snap-align:start;padding:30px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:200px}
+    .s1{background:linear-gradient(120deg,#eaf5ef,#f5f8e9)}.s2{background:linear-gradient(120deg,#fff3dd,#fdeccb)}.s3{background:linear-gradient(120deg,#e3f0fa,#e9f5ee)}
+    .slide h2{font-size:clamp(24px,4vw,38px);line-height:1.12;letter-spacing:-1px;margin:0 0 10px;max-width:560px}.slide h2 span{color:var(--green)}
+    .slide p{color:#52655a;line-height:1.6;margin:0 0 16px;max-width:520px;font-size:14px}
+    .slide-art{font-size:84px;flex:none}
+    .dots{display:flex;justify-content:center;gap:7px}.dots-wrap{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:10px}.pause{border:0;background:#eef3ef;color:var(--muted);width:26px;height:26px;border-radius:50%;font-size:11px;padding:0;line-height:1}
+    .dots button{width:8px;height:8px;border-radius:50%;border:0;padding:0;background:#c9d8cf;transition:.2s}.dots button.on{width:22px;border-radius:5px;background:var(--metal)}
+    .strip{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:8px;scrollbar-width:thin}
+    .mini{flex:0 0 160px;scroll-snap-align:start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;text-align:left;color:inherit;transition:.18s}
+    .mini:hover{transform:translateY(-2px);box-shadow:0 8px 20px #183d2910}
+    .mini-emoji{font-size:34px;margin-bottom:6px}.mini-title{font-size:13px;font-weight:750;line-height:1.35;height:35px;overflow:hidden}
+    @media(max-width:650px){.carousel{padding:6px 15px 0}.slide{padding:20px 18px;min-height:0}.slide-art{display:none}.slide h2{font-size:23px}.slide p{font-size:13px;margin-bottom:12px}.mini{flex-basis:140px}}
+    [hidden]{display:none!important}
+    .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+    #iklan{scroll-margin-top:96px}
+    @media(max-width:650px){#iklan{scroll-margin-top:132px}}
+    .linklike{background:none;border:0;padding:0;color:inherit;text-decoration:underline;cursor:pointer;font-size:inherit}
+    .field .linklike{color:var(--green);font-weight:700}
+    .field label.check{display:flex;gap:9px;align-items:flex-start;font-weight:600;line-height:1.55;font-size:12px}
+    .field label.check input{width:auto;flex:none;padding:0;margin-top:3px}
+    .legal{font-size:13px;line-height:1.65;color:#33443a}.legal h3{font-size:14px;margin:14px 0 4px}.legal p{margin:6px 0}.legal ul{padding-left:18px;margin:4px 0}.legal a{color:var(--green);text-decoration:underline}
+    .modal-box.narrow{width:min(420px,100%)}
+    #ownerToggle{font-size:12px;color:var(--muted);align-self:center}
+    /* Logo teks YANA: huruf bergoyang bergelombang, lalu jeda sejenak. Otomatis mati bila pengguna memilih "kurangi gerakan". */
+    .brand-name span{display:inline-block;transform-origin:50% 100%;animation:yanaWave 3s ease-in-out infinite;animation-delay:calc(var(--i)*.14s)}
+    @keyframes yanaWave{0%,55%,100%{transform:translateY(0) rotate(0)}10%{transform:translateY(-5px) rotate(-8deg)}22%{transform:translateY(0) rotate(6deg)}34%{transform:translateY(-3px) rotate(-4deg)}46%{transform:translateY(0) rotate(2deg)}}
+    .brand:hover .brand-name span{animation-duration:.7s}
+    .search .btn{white-space:nowrap;flex:none}
+    /* ===== Tema hijau metalik ===== */
+    .brand-name{filter:drop-shadow(0 1px 1px #0b3d2d33)}
+    .brand-name span{background:linear-gradient(180deg,#3cc29a 0%,#14805e 42%,#0a4a37 52%,#1b8a67 78%,#2aa77f 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+    .logo::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,#ffffff66 50%,transparent 65%);transform:translateX(-130%);animation:sheen 5s ease-in-out infinite;pointer-events:none}
+    .cta{background:var(--metal);position:relative;overflow:hidden;box-shadow:inset 0 1px 0 #ffffff40,0 12px 30px #176b5233}
+    .cta>*{position:relative;z-index:1}
+    .cta::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,#ffffff26 50%,transparent 60%);transform:translateX(-130%);animation:sheen 7s ease-in-out 1.5s infinite;pointer-events:none}
+    @keyframes sheen{0%,60%{transform:translateX(-130%)}100%{transform:translateX(130%)}}
+    /* ===== Aksen emas ===== */
+    :root{--gold:linear-gradient(135deg,#9c7326 0%,#f1d78a 28%,#c79f46 52%,#fff1bd 74%,#a67c2e 100%);--gold-solid:#d4af55}
+    header{border-bottom:0}
+    header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--gold)}
+    .logo{box-shadow:0 0 0 2px #f1d78a,0 0 0 3.5px #b08a33,inset 0 1px 0 #ffffff66,inset 0 -2px 3px #00000030,0 6px 16px #176b5240}
+    .badge{background:var(--gold);color:#4a3510;border:1px solid #b9923c;box-shadow:inset 0 1px 0 #ffffff80}
+    .cat.active{border-color:var(--gold-solid);box-shadow:0 0 0 1px var(--gold-solid)}
+    .cta{box-shadow:inset 0 0 0 1.5px #e2c36d,inset 0 1px 0 #ffffff40,0 12px 30px #176b5233}
+    .cta .btn{background:var(--gold);color:#3f2d08;text-shadow:0 1px 0 #fff3c9aa;box-shadow:inset 0 1px 0 #ffffff99,0 4px 12px #00000030}
+    .cta .btn:hover{filter:brightness(1.07)}
+    footer{border-top:3px solid;border-image:var(--gold) 1}
+    .section-head h2::after{content:"";display:block;width:34px;height:3px;border-radius:2px;background:var(--gold);margin-top:6px}
+  </style>
+</head>
+<body>
+  <div class="topbar">🌿 YANA — tempat bertemunya kebutuhan, barang, jasa, dan kesempatan.</div>
+  <header>
+    <nav class="nav" aria-label="Navigasi utama">
+      <a class="brand" href="#" aria-label="YANA Beranda">
+        <div class="logo">Y</div>
+        <div><div class="brand-name" aria-label="YANA"><span aria-hidden="true" style="--i:0">Y</span><span aria-hidden="true" style="--i:1">A</span><span aria-hidden="true" style="--i:2">N</span><span aria-hidden="true" style="--i:3">A</span></div><div class="brand-tag">Iklan Gratis untuk Semua</div></div>
+      </a>
+      <form class="search" id="searchForm" role="search">
+        <input id="searchInput" type="search" placeholder="Cari barang, jasa, pekerjaan..." aria-label="Cari iklan">
+        <button class="btn btn-primary" type="submit">🔍 Cari</button>
+      </form>
+      <button class="btn btn-primary" type="button" id="openAdTop">＋ Pasang Iklan</button>
+    </nav>
+  </header>
+
+  <main>
+    <h1 class="sr-only">YANA — Iklan Gratis untuk Semua</h1>
+    <section class="wrap cat-top" aria-labelledby="kategoriTitle">
+      <div class="section-head">
+        <div><h2 id="kategoriTitle">Jelajahi Kategori</h2><div class="sub">Pilih kategori untuk menemukan iklan yang relevan.</div></div>
+      </div>
+      <div class="categories" id="categories">
+        <button class="cat active" aria-pressed="true" data-category="Semua"><span class="cat-icon">✨</span><span>Semua</span></button>
+        <button class="cat" aria-pressed="false" data-category="Kendaraan"><span class="cat-icon">🚗</span><span>Kendaraan</span></button>
+        <button class="cat" aria-pressed="false" data-category="Properti"><span class="cat-icon">🏠</span><span>Properti</span></button>
+        <button class="cat" aria-pressed="false" data-category="Elektronik"><span class="cat-icon">📱</span><span>Elektronik</span></button>
+        <button class="cat" aria-pressed="false" data-category="Rumah Tangga"><span class="cat-icon">🪑</span><span>Rumah Tangga</span></button>
+        <button class="cat" aria-pressed="false" data-category="Jasa"><span class="cat-icon">🧰</span><span>Jasa</span></button>
+        <button class="cat" aria-pressed="false" data-category="Lowongan Kerja"><span class="cat-icon">💼</span><span>Lowongan</span></button>
+        <button class="cat" aria-pressed="false" data-category="Lainnya"><span class="cat-icon">📦</span><span>Lainnya</span></button>
+      </div>
+    </section>
+
+    <div class="carousel" aria-roledescription="carousel" aria-label="Info YANA">
+      <div class="slides" id="slides">
+        <div class="slide s1"><div><h2>Temukan yang kamu cari.<br><span>Tawarkan yang kamu punya.</span></h2><p>Pasang iklan, temukan barang, tawarkan jasa, atau cari peluang di sekitarmu.</p><div class="hero-actions"><button class="btn btn-primary" id="openAdHero">＋ Pasang Iklan Gratis</button><a class="btn btn-light" href="#iklan">Jelajahi Iklan ↓</a></div></div><div class="slide-art" aria-hidden="true">🛍️</div></div>
+        <div class="slide s2"><div><h2>Cari kerja atau <span>cari karyawan?</span></h2><p>Lihat lowongan terbaru di sekitarmu, atau pasang lowongan gratis untuk usahamu.</p><div class="hero-actions"><button class="btn btn-primary" data-cat="Lowongan Kerja">💼 Lihat Lowongan</button><button class="btn btn-light" data-open-ad>＋ Pasang Lowongan</button></div></div><div class="slide-art" aria-hidden="true">💼</div></div>
+        <div class="slide s3"><div><h2>Transaksi lebih <span>aman</span></h2><p>Bertemu langsung di tempat ramai, periksa barang dulu, dan jangan pernah bagikan PIN atau kode OTP.</p><div class="hero-actions"><button class="btn btn-primary" data-open-ad>＋ Pasang Iklan Gratis</button></div></div><div class="slide-art" aria-hidden="true">🛡️</div></div>
+      </div>
+      <div class="dots-wrap"><div class="dots" id="dots"><button class="on" aria-label="Slide 1" aria-current="true"></button><button aria-label="Slide 2" aria-current="false"></button><button aria-label="Slide 3" aria-current="false"></button></div><button class="pause" id="pauseBtn" type="button" aria-label="Jeda geser otomatis" aria-pressed="false">⏸</button></div>
+    </div>
+
+    <section class="wrap" id="latestSec" hidden aria-labelledby="latestTitle">
+      <div class="section-head"><div><h2 id="latestTitle">Iklan Terbaru</h2><div class="sub">Geser ke samping untuk melihat lebih banyak →</div></div></div>
+      <div class="strip" id="latestStrip"></div>
+    </section>
+
+
+    <section class="wrap" id="iklan" aria-labelledby="iklanTitle">
+      <div class="section-head">
+        <div><h2 id="iklanTitle">Iklan Pilihan</h2><div class="sub">Iklan aktif ditampilkan di sini. Iklan kedaluwarsa otomatis disembunyikan.</div></div>
+        <button class="btn btn-outline" id="clearFilters">↺ Reset pencarian</button>
+      </div>
+      <div class="toolbar">
+        <select id="locationFilter" aria-label="Filter lokasi">
+          <option value="">Semua lokasi</option><option>Yogyakarta</option><option>Bantul</option><option>Sleman</option><option>Jakarta</option><option>Bandung</option><option>Surabaya</option><option>Lainnya</option>
+        </select>
+        <select id="sortFilter" aria-label="Urutkan iklan">
+          <option value="new">Terbaru</option><option value="low">Harga terendah</option><option value="high">Harga tertinggi</option>
+        </select>
+        <div class="result-count" id="resultCount" aria-live="polite">Memuat iklan…</div>
+      </div>
+      <div class="listings" id="listingGrid"></div>
+      <p class="disclaimer" id="dataNotice">Hubungkan YANA ke database terlebih dahulu agar iklan tersimpan dan dapat dilihat semua pengunjung.</p>
+    </section>
+
+    <section class="wrap" aria-labelledby="caraTitle">
+      <div class="section-head"><div><h2 id="caraTitle">Cara kerja YANA</h2><div class="sub">Mulai sederhana, langsung terhubung.</div></div></div>
+      <div class="how">
+        <article class="how-card"><div class="how-icon">📝</div><h3>1. Buat iklan</h3><p>Isi judul, kategori, harga, lokasi, dan kontak. Formulir ini membantu menyiapkan iklan.</p></article>
+        <article class="how-card"><div class="how-icon">🔎</div><h3>2. Temukan peluang</h3><p>Gunakan pencarian dan kategori untuk menjelajahi barang, jasa, properti, atau pekerjaan.</p></article>
+        <article class="how-card"><div class="how-icon">💬</div><h3>3. Hubungi langsung</h3><p>Calon pembeli dan pengiklan dapat berkomunikasi secara langsung setelah iklan dipublikasikan.</p></article>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <div class="cta">
+        <div><h2>Punya sesuatu untuk ditawarkan?</h2><p>Buat iklan yang jelas agar orang lebih mudah menemukan penawaranmu.</p></div>
+        <button class="btn" id="openAdBottom">＋ Mulai Pasang Iklan</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div><div class="footer-brand">YANA</div><div class="footer-note">Iklan Gratis untuk Semua<br>Tempat masyarakat menemukan barang, menawarkan jasa, dan berbagi kesempatan.</div></div>
+      <div class="footer-note">Gunakan YANA dengan bijak. Periksa barang dan identitas penjual sebelum bertransaksi. Jangan pernah membagikan PIN, kata sandi, atau kode OTP.</div>
+    </div>
+    <div class="footer-bottom">© <span id="year"></span> YANA. Dibuat untuk masyarakat Indonesia. · <button class="linklike" type="button" data-legal="syarat">Syarat Penggunaan</button> · <button class="linklike" type="button" data-legal="privasi">Kebijakan Privasi</button> · <button class="linklike" type="button" data-legal="kontak">Kontak</button></div>
+  </footer>
+
+  <div class="modal" id="adModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-box">
+      <div class="modal-head"><h2 id="modalTitle">Pasang Iklan Gratis</h2><button class="close" id="closeModal" aria-label="Tutup">×</button></div>
+      <p class="sub">Isi informasi di bawah. Iklan akan berlaku selama 30 hari.</p>
+      <div class="notice" id="formNotice">Iklan berlaku 30 hari. Jangan mencantumkan data rahasia. Iklan yang dikirim langsung tampil dan dapat dilihat publik. Nomor WhatsApp boleh diawali 08 atau 62.</div>
+      <form id="adForm">
+        <div class="form-grid">
+          <div class="field full"><label for="adTitle">Judul iklan *</label><input id="adTitle" required minlength="3" maxlength="90" placeholder="Contoh: Sepeda lipat kondisi bagus"></div>
+          <div class="field"><label for="adCategory">Kategori *</label><select id="adCategory" required><option value="">Pilih kategori</option><option>Kendaraan</option><option>Properti</option><option>Elektronik</option><option>Rumah Tangga</option><option>Jasa</option><option>Lowongan Kerja</option><option>Lainnya</option></select></div>
+          <div class="field"><label for="adPrice">Harga (Rp)</label><input id="adPrice" type="number" min="0" placeholder="0 jika gratis/nego"></div>
+          <div class="field"><label for="adLocation">Kota / kabupaten *</label><input id="adLocation" required minlength="2" maxlength="60" placeholder="Contoh: Bantul"></div>
+          <div class="field"><label for="adContact">WhatsApp *</label><input id="adContact" required inputmode="tel" placeholder="Contoh: 08123456789"></div>
+          <div class="field full"><label for="adDescription">Deskripsi *</label><textarea id="adDescription" required minlength="5" maxlength="1000" placeholder="Jelaskan kondisi, ukuran, layanan, atau persyaratan..."></textarea><div class="count" id="descCount">0/1000</div></div>
+          <div class="hp" aria-hidden="true"><label>Website<input id="adWebsite" tabindex="-1" autocomplete="off"></label></div>
+          <div class="field full"><label for="adName">Nama pengiklan *</label><input id="adName" required minlength="2" maxlength="60" placeholder="Nama yang ingin ditampilkan"></div>
+          <div class="field full" id="agreeRow"><label class="check"><input type="checkbox" id="adAgree" required><span>Saya setuju dengan <button type="button" class="linklike" data-legal="syarat">Syarat Penggunaan</button> dan <button type="button" class="linklike" data-legal="privasi">Kebijakan Privasi</button>. Nomor WhatsApp dan isi iklan saya akan tampil publik.</span></label></div>
+        </div>
+        <div class="form-actions"><button class="btn btn-outline" type="button" id="cancelModal">Batal</button><button class="btn btn-primary" id="submitAdBtn" type="submit">Publikasikan Iklan</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="modal" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+    <div class="modal-box">
+      <div class="modal-head"><h2 id="dTitle"></h2><button class="close" id="closeDetail" aria-label="Tutup">×</button></div>
+      <div class="price" id="dPrice"></div>
+      <div class="d-meta" id="dMeta"></div>
+      <p class="d-desc" id="dDesc"></p>
+      <div class="form-actions" style="justify-content:space-between;flex-wrap:wrap">
+        <div class="report"><select id="reportReason" aria-label="Alasan laporan"><option value="">Laporkan iklan…</option><option>Penipuan</option><option>Spam / duplikat</option><option>Barang terlarang</option><option>Konten tidak pantas</option><option>Lainnya</option></select><button class="btn btn-outline" id="reportBtn" type="button">Kirim laporan</button></div>
+        <a class="btn btn-primary" id="dWA" target="_blank" rel="noopener">💬 Hubungi via WhatsApp</a>
+      </div>
+      <div class="report" style="margin-top:12px"><button class="btn btn-outline" id="shareBtn" type="button">🔗 Bagikan iklan</button><button class="linklike" id="ownerToggle" type="button">Pemilik iklan? Kelola dengan kode</button></div>
+      <div class="report" id="ownerBar" style="margin-top:12px" hidden><span class="sub" style="align-self:center;margin:0">Kelola iklan ini:</span><button class="btn btn-outline" id="editBtn" type="button">✏️ Edit</button><button class="btn btn-outline" id="delBtn" type="button">🗑️ Hapus</button></div>
+      <p class="disclaimer">Jangan transfer uang sebelum bertemu dan memeriksa barang. YANA tidak menjadi pihak dalam transaksi.</p>
+    </div>
+  </div>
+  <div class="modal" id="codeModal" role="dialog" aria-modal="true" aria-labelledby="cTitle">
+    <div class="modal-box">
+      <div class="modal-head"><h2 id="cTitle">Iklan terbit! Simpan kode ini</h2></div>
+      <div class="notice">Kode ini satu-satunya cara untuk mengedit atau menghapus iklanmu. Kode tidak dapat dipulihkan. <span id="codeSavedNote"></span></div>
+      <div class="price" id="codeVal" style="font-size:28px;letter-spacing:3px;text-align:center"></div>
+      <div class="form-actions"><button class="btn btn-outline" id="copyCode" type="button">Salin kode</button><button class="btn btn-primary" id="doneCode" type="button">Saya sudah menyimpan</button></div>
+    </div>
+  </div>
+  <div class="modal" id="legalModal" role="dialog" aria-modal="true" aria-labelledby="legalTitle">
+    <div class="modal-box">
+      <div class="modal-head"><h2 id="legalTitle"></h2><button class="close" id="closeLegal" aria-label="Tutup">×</button></div>
+      <div class="legal" id="legalBody"></div>
+    </div>
+  </div>
+  <div class="modal" id="askModal" role="dialog" aria-modal="true" aria-labelledby="askTitle">
+    <div class="modal-box narrow">
+      <div class="modal-head"><h2 id="askTitle">Masukkan kode kelola</h2></div>
+      <p class="sub">Kode ini didapat saat iklan dipasang.</p>
+      <form id="askForm">
+        <div class="field"><label for="askInput">Kode kelola</label><input id="askInput" required autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="30"></div>
+        <div class="form-actions"><button class="btn btn-outline" type="button" id="askCancel">Batal</button><button class="btn btn-primary" type="submit">Lanjut</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // LANGKAH SETUP: isi URL project dan anon/publishable key dari Supabase.
+    // Jangan pernah menaruh service_role key di file website publik.
+    const SUPABASE_URL = "https://gwsuuriaeycvkdrccmqx.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_8cjQq4UQYjTZZ6lQBVnobA_Ug3EmBzJ";
+    const CONTACT_EMAIL = "ISI_EMAIL_KONTAK"; // email untuk laporan penyalahgunaan & permintaan hapus data
+    const isConfigured = SUPABASE_URL.startsWith("https://") && !SUPABASE_URL.includes("ISI_") && !SUPABASE_ANON_KEY.includes("ISI_");
+
+    const $ = id => document.getElementById(id);
+    const AD_COLS = "id,title,category,price,location,whatsapp,description,seller_name,created_at,expires_at";
+    const SERVER_PAGE = 300;
+    let liveAds = [], totalAds = null, serverHasMore = false;
+    let activeCategory = "Semua", searchTerm = "";
+    const grid = $("listingGrid"), count = $("resultCount"), locationFilter = $("locationFilter"), sortFilter = $("sortFilter");
+    const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Number(n).toLocaleString("id-ID");
+    const escapeHTML = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    const emojiFor = category => ({"Kendaraan":"🚗","Properti":"🏡","Elektronik":"📱","Rumah Tangga":"🪑","Jasa":"🧰","Lowongan Kerja":"💼","Lainnya":"📦"}[category] || "📦");
+    function supaHeaders(extra={}) { return {"apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY,"Content-Type":"application/json",...extra}; }
+    const smooth = () => matchMedia("(prefers-reduced-motion:reduce)").matches ? "auto" : "smooth";
+    const scrollToList = () => $("iklan").scrollIntoView({behavior:smooth()});
+
+    // Pesan error database -> bahasa yang ramah pengguna
+    function friendlyError(err){
+      const m = String((err && err.message) || err || "");
+      if(/ads_title_check/.test(m)) return "Judul minimal 3 huruf.";
+      if(/ads_location_check/.test(m)) return "Lokasi minimal 2 huruf.";
+      if(/ads_seller_name_check/.test(m)) return "Nama pengiklan minimal 2 huruf.";
+      if(/ads_description_check/.test(m)) return "Deskripsi minimal 5 karakter.";
+      if(/ads_whatsapp_check/.test(m)) return "Nomor WhatsApp tidak valid.";
+      if(/HTTP 429/.test(m)) return "Terlalu banyak permintaan. Coba lagi beberapa saat lagi.";
+      if(/Failed to fetch|NetworkError|Load failed/i.test(m)) return "Koneksi bermasalah. Periksa internet lalu coba lagi.";
+      if(/check constraint|violates|HTTP 4\d\d/i.test(m)) return "Data belum sesuai. Periksa kembali isian Anda.";
+      return m || "Terjadi kesalahan.";
+    }
+
+    // ---------- Modal: buka/tutup, fokus kembali, jebakan fokus ----------
+    function openLayer(m, focusEl){
+      m._ret = document.activeElement;
+      m.classList.add("open"); document.body.style.overflow = "hidden";
+      setTimeout(()=>{const t = focusEl || m.querySelector("button,input,select,textarea,a[href]"); if(t) t.focus();}, 50);
+    }
+    function closeLayer(m){
+      if(!m.classList.contains("open")) return;
+      m.classList.remove("open");
+      if(!document.querySelector(".modal.open")) document.body.style.overflow = "";
+      const r = m._ret; m._ret = null;
+      if(r && document.contains(r) && r.focus) r.focus();
+    }
+    document.addEventListener("keydown", e=>{
+      if(e.key !== "Tab") return;
+      const m = [...document.querySelectorAll(".modal.open")].pop(); if(!m) return;
+      const f = [...m.querySelectorAll('button:not([disabled]),input:not([disabled]):not([tabindex="-1"]),select:not([disabled]),textarea:not([disabled]),a[href]')].filter(x=>x.offsetParent !== null);
+      if(!f.length) return;
+      const first = f[0], last = f[f.length-1];
+      if(!m.contains(document.activeElement)){e.preventDefault(); first.focus();}
+      else if(e.shiftKey && document.activeElement === first){e.preventDefault(); last.focus();}
+      else if(!e.shiftKey && document.activeElement === last){e.preventDefault(); first.focus();}
+    });
+
+    let toastTimer;
+    function showToast(message){const t=$("toast");t.textContent=message;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),5000);}
+
+    // ---------- Muat iklan ----------
+    async function loadAds(more=false){
+      if(!isConfigured){
+        $("dataNotice").textContent = "MODE SETUP: database belum dihubungkan. Ikuti panduan YANA-SETUP.txt dan jalankan SQL yang disediakan.";
+        count.textContent = "Database belum terhubung";
+        grid.innerHTML = '<div class="empty"><b>YANA siap dipasang database</b>Setelah Supabase dikonfigurasi, iklan masyarakat akan tampil di sini dan otomatis disaring jika kedaluwarsa.</div>';
+        return;
+      }
+      if(!more) grid.innerHTML = '<div class="skel"></div>'.repeat(4);
+      try {
+        const offset = more ? liveAds.length : 0;
+        const url = SUPABASE_URL + "/rest/v1/ads?select="+AD_COLS+"&expires_at=gt."+encodeURIComponent(new Date().toISOString())+"&order=created_at.desc&limit="+SERVER_PAGE+"&offset="+offset;
+        const res = await fetch(url,{headers:supaHeaders({"Prefer":"count=exact"})});
+        if(!res.ok) throw new Error("Database mengembalikan status "+res.status);
+        const rows = await res.json();
+        const cr = res.headers.get("Content-Range"), tot = cr ? cr.split("/")[1] : null;
+        totalAds = tot && tot !== "*" ? Number(tot) : null;
+        if(more){const ids = new Set(liveAds.map(a=>a.id)); liveAds = liveAds.concat(rows.filter(r=>!ids.has(r.id)));}
+        else liveAds = rows;
+        serverHasMore = rows.length === SERVER_PAGE && (totalAds == null || liveAds.length < totalAds);
+        renderLatest();
+        $("dataNotice").textContent = "Iklan masyarakat aktif. Masa berlaku 30 hari; iklan kedaluwarsa otomatis tidak ditampilkan.";
+        if(more){shown += PAGE; draw();} else renderListings();
+      } catch(err){
+        if(more){showToast("Gagal memuat iklan lama: "+friendlyError(err)); draw(); return;}
+        $("dataNotice").textContent = "Belum dapat memuat iklan. Periksa URL/key Supabase, tabel, dan kebijakan akses (RLS).";
+        grid.innerHTML = '<div class="empty"><b>Database belum tersambung</b>Periksa pengaturan Supabase dan SQL. Detail: '+escapeHTML(err.message)+'</div>';
+        count.textContent = "Gagal memuat";
+      }
+    }
+    const PAGE=12, KNOWN_LOC=["yogyakarta","bantul","sleman","jakarta","bandung","surabaya"];
+    let shown=PAGE, visibleAds=[];
+    function timeAgo(d){const m=Math.floor((Date.now()-new Date(d))/6e4);if(m<1)return"Baru saja";if(m<60)return m+" menit lalu";const h=Math.floor(m/60);if(h<24)return h+" jam lalu";return Math.floor(h/24)+" hari lalu";}
+    function normWA(v){let d=String(v||"").replace(/\D/g,"");if(d.startsWith("0"))d="62"+d.slice(1);else if(d.startsWith("8"))d="62"+d;return d;}
+    function renderListings(){shown=PAGE;draw();}
+    // Harga kosong / 0 ("Hubungi") selalu di urutan paling akhir saat sort harga
+    const pv = a => Number(a.price) > 0 ? Number(a.price) : null;
+    const byPrice = dir => (a,b)=>{const x=pv(a),y=pv(b);if(x===null&&y===null)return 0;if(x===null)return 1;if(y===null)return -1;return dir*(x-y);};
+    function draw(){
+      const f=locationFilter.value.toLowerCase();
+      let ads=liveAds.filter(ad=>{
+        const loc=ad.location.toLowerCase();
+        const hay=`${ad.title} ${ad.category} ${ad.location} ${ad.description} ${ad.seller_name}`.toLowerCase();
+        const locOk=!f||(f==="lainnya"?!KNOWN_LOC.some(k=>loc.includes(k)):loc.includes(f));
+        return (activeCategory==="Semua"||ad.category===activeCategory)&&(!searchTerm||searchTerm.split(/\s+/).every(w=>hay.includes(w)))&&locOk;
+      });
+      if(sortFilter.value==="low")ads.sort(byPrice(1));
+      else if(sortFilter.value==="high")ads.sort(byPrice(-1));
+      else ads.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+      visibleAds=ads;
+      count.textContent=`${ads.length} iklan`+(serverHasMore?` · baru memuat ${liveAds.length}${totalAds?" dari "+totalAds:""}`:"");
+      if(!ads.length){grid.innerHTML='<div class="empty"><b>Belum ada iklan yang cocok</b>Coba kata kunci lain, atau jadilah yang pertama memasang iklan di YANA.'+(serverHasMore?'<br><button class="btn btn-outline" id="moreServerBtn" style="margin-top:12px">Muat iklan yang lebih lama</button>':'')+'</div>';return;}
+      grid.innerHTML=ads.slice(0,shown).map(ad=>{
+        const fresh=Date.now()-new Date(ad.created_at)<48*36e5;
+        return `<article class="listing">
+          <div class="listing-img"><span class="badge">${fresh?"BARU":escapeHTML(ad.category).toUpperCase()}</span>${emojiFor(ad.category)}</div>
+          <div class="listing-body">
+            <div class="listing-title">${escapeHTML(ad.title)}</div>
+            <div class="price">${money(ad.price)}</div>
+            <div class="listing-meta"><span>📍 ${escapeHTML(ad.location)}</span><span>${timeAgo(ad.created_at)}</span></div>
+            <button class="btn btn-light" data-details="${escapeHTML(ad.id)}">Lihat detail</button>
+          </div></article>`;}).join("")
+        +(ads.length>shown?'<div class="more" style="grid-column:1/-1"><button class="btn btn-outline" id="moreBtn">Tampilkan lebih banyak ↓</button></div>'
+          :serverHasMore?'<div class="more" style="grid-column:1/-1"><button class="btn btn-outline" id="moreServerBtn">Muat iklan yang lebih lama ↓</button></div>':"");
+    }
+    grid.addEventListener("click",async e=>{
+      if(e.target.id==="moreBtn"){shown+=PAGE;draw();return;}
+      if(e.target.id==="moreServerBtn"){e.target.disabled=true;e.target.textContent="Memuat…";await loadAds(true);return;}
+      const b=e.target.closest("[data-details]");if(b)openDetail(b.dataset.details);
+    });
+
+    // ---------- Detail iklan + tautan langsung (#ad=<id>) ----------
+    let currentAd=null;
+    const detailModal=$("detailModal");
+    function openDetail(id){const ad=liveAds.find(a=>String(a.id)===id);if(ad)showAd(ad);}
+    function showAd(ad){
+      currentAd=ad;
+      $("dTitle").textContent=ad.title;
+      $("dPrice").textContent=money(ad.price);
+      $("dDesc").textContent=ad.description;
+      const meta=$("dMeta");meta.innerHTML="";
+      [ "📍 "+ad.location,"🏷️ "+ad.category,"👤 "+ad.seller_name,"🕒 "+timeAgo(ad.created_at),"⏳ s.d. "+new Date(ad.expires_at).toLocaleDateString("id-ID")].forEach(t=>{const c=document.createElement("span");c.className="chip";c.textContent=t;meta.appendChild(c);});
+      const n=normWA(ad.whatsapp);
+      $("dWA").href="https://wa.me/"+n+"?text="+encodeURIComponent("Halo, saya melihat iklan \""+ad.title+"\" di YANA. Apakah masih tersedia?");
+      $("reportReason").value="";
+      const owned=!!mine()[ad.id];
+      $("ownerBar").hidden=!owned; $("ownerToggle").hidden=owned;
+      openLayer(detailModal,$("closeDetail"));
+      try{history.replaceState(null,"","#ad="+ad.id);}catch{}
+    }
+    function closeDetail(){
+      closeLayer(detailModal);
+      try{if(location.hash.startsWith("#ad="))history.replaceState(null,"",location.pathname+location.search);}catch{}
+    }
+    async function openFromHash(){
+      const m=location.hash.match(/^#ad=([0-9a-fA-F-]{36})$/);if(!m||!isConfigured)return;
+      const id=m[1].toLowerCase();
+      if(currentAd&&String(currentAd.id)===id&&detailModal.classList.contains("open"))return;
+      let ad=liveAds.find(a=>String(a.id)===id);
+      if(!ad){try{const res=await fetch(SUPABASE_URL+"/rest/v1/ads?select="+AD_COLS+"&id=eq."+id+"&expires_at=gt."+encodeURIComponent(new Date().toISOString()),{headers:supaHeaders()});if(res.ok)ad=(await res.json())[0];}catch{}}
+      if(!ad){showToast("Iklan tidak ditemukan atau sudah kedaluwarsa.");try{history.replaceState(null,"",location.pathname+location.search);}catch{}return;}
+      showAd(ad);
+    }
+    window.addEventListener("hashchange",openFromHash);
+    $("closeDetail").addEventListener("click",closeDetail);
+    detailModal.addEventListener("click",e=>{if(e.target===detailModal)closeDetail();});
+    $("shareBtn").addEventListener("click",async()=>{
+      if(!currentAd)return;
+      const url=location.href.split("#")[0]+"#ad="+currentAd.id;
+      if(navigator.share){try{await navigator.share({title:currentAd.title,url});return;}catch(e){if(e&&e.name==="AbortError")return;}}
+      try{await navigator.clipboard.writeText(url);showToast("Tautan iklan disalin.");}catch{showToast("Salin tautan dari kolom alamat browser.");}
+    });
+    $("reportBtn").addEventListener("click",async()=>{
+      const reason=$("reportReason").value;
+      if(!reason){showToast("Pilih alasan laporan dulu.");return;}
+      if(!currentAd)return;
+      const btn=$("reportBtn");btn.disabled=true;
+      try{
+        const res=await fetch(SUPABASE_URL+"/rest/v1/reports",{method:"POST",headers:supaHeaders({"Prefer":"return=minimal"}),body:JSON.stringify({ad_id:currentAd.id,reason})});
+        if(res.status===409){closeDetail();showToast("Anda sudah melaporkan iklan ini sebelumnya.");return;}
+        if(!res.ok){let d="HTTP "+res.status;try{d=(await res.json()).message||d;}catch{}throw new Error(d);}
+        closeDetail();showToast("Terima kasih, laporan sudah diterima.");
+      }catch(err){showToast("Laporan belum terkirim: "+friendlyError(err));}
+      finally{btn.disabled=false;}
+    });
+
+    // ---------- Kategori, pencarian, filter ----------
+    function setActiveCat(name){
+      activeCategory=name;
+      document.querySelectorAll(".cat").forEach(c=>{const on=c.dataset.category===name;c.classList.toggle("active",on);c.setAttribute("aria-pressed",String(on));});
+    }
+    $("categories").addEventListener("click",e=>{
+      const btn=e.target.closest("[data-category]"); if(!btn)return;
+      setActiveCat(btn.dataset.category);renderListings();scrollToList();
+    });
+    let searchTimer;$("searchInput").addEventListener("input",e=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{searchTerm=e.target.value.trim().toLowerCase();renderListings();},250);});
+    $("searchForm").addEventListener("submit",e=>{e.preventDefault();searchTerm=$("searchInput").value.trim().toLowerCase();renderListings();scrollToList();});
+    locationFilter.addEventListener("change",renderListings);sortFilter.addEventListener("change",renderListings);
+    $("clearFilters").addEventListener("click",()=>{searchTerm="";$("searchInput").value="";locationFilter.value="";sortFilter.value="new";setActiveCat("Semua");renderListings();});
+
+    // ---------- Form pasang / edit iklan ----------
+    const modal=$("adModal");
+    const NOTICE_NEW=$("formNotice").textContent;
+    let editing=null;
+    function openModal(){openLayer(modal,$("adTitle"));}
+    function closeModal(){
+      if(editing){editing=null;setMode(false);$("adForm").reset();$("descCount").textContent="0/1000";}
+      closeLayer(modal);
+    }
+    function setMode(edit){
+      $("modalTitle").textContent=edit?"Edit Iklan":"Pasang Iklan Gratis";
+      $("submitAdBtn").textContent=edit?"Simpan Perubahan":"Publikasikan Iklan";
+      $("formNotice").textContent=edit?"Perbarui informasi iklan. Masa berlaku iklan tidak berubah. Nomor WhatsApp boleh diawali 08 atau 62.":NOTICE_NEW;
+      $("agreeRow").hidden=edit;$("adAgree").required=!edit;
+    }
+    ["openAdTop","openAdHero","openAdBottom"].forEach(id=>$(id).addEventListener("click",openModal));
+    ["closeModal","cancelModal"].forEach(id=>$(id).addEventListener("click",closeModal));
+    modal.addEventListener("click",e=>{if(e.target===modal)closeModal();});
+    const descEl=$("adDescription");
+    descEl.addEventListener("input",()=>$("descCount").textContent=descEl.value.length+"/1000");
+
+    const COOLDOWN=2*60*1000;
+    const MINE_KEY="yana_mine";
+    const mine=()=>{try{return JSON.parse(localStorage.getItem(MINE_KEY)||"{}")}catch{return{}}};
+    const saveMine=(id,code)=>{try{const m=mine();m[id]=code;localStorage.setItem(MINE_KEY,JSON.stringify(m));return true}catch{return false}};
+    const dropMine=id=>{try{const m=mine();delete m[id];localStorage.setItem(MINE_KEY,JSON.stringify(m))}catch{}};
+    // Kode kelola: 10 karakter, tanpa modulo bias (31 simbol; 248 = 31*8)
+    const newCode=()=>{const a="abcdefghjkmnpqrstuvwxyz23456789",out=[];while(out.length<10){for(const x of crypto.getRandomValues(new Uint8Array(16))){if(x<248&&out.length<10)out.push(a[x%31]);}}return out.join("")};
+    async function sha256(t){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+    async function rpc(fn,args){const res=await fetch(SUPABASE_URL+"/rest/v1/rpc/"+fn,{method:"POST",headers:supaHeaders(),body:JSON.stringify(args)});if(!res.ok){let d="HTTP "+res.status;try{d=(await res.json()).message||d}catch{}throw new Error(d)}return res.json()}
+
+    // Dialog kode kelola (pengganti prompt())
+    const askModal=$("askModal");let askResolve=null;
+    function askCode(){return new Promise(res=>{askResolve=res;$("askInput").value="";openLayer(askModal,$("askInput"));});}
+    function closeAsk(val){closeLayer(askModal);const r=askResolve;askResolve=null;if(r)r(val);}
+    $("askForm").addEventListener("submit",e=>{e.preventDefault();const v=$("askInput").value.trim().toLowerCase();closeAsk(v||null);});
+    $("askCancel").addEventListener("click",()=>closeAsk(null));
+    askModal.addEventListener("click",e=>{if(e.target===askModal)closeAsk(null);});
+    async function getCode(ad){const c=mine()[ad.id];return c?c:askCode();}
+
+    $("ownerToggle").addEventListener("click",()=>{$("ownerToggle").hidden=true;$("ownerBar").hidden=false;});
+    $("editBtn").addEventListener("click",async()=>{
+      if(!currentAd)return;const ad=currentAd,code=await getCode(ad);if(!code)return;
+      closeDetail();openModal();editing={ad,code};setMode(true);
+      const set=(id,v)=>$(id).value=v??"";
+      set("adTitle",ad.title);set("adCategory",ad.category);set("adPrice",ad.price);set("adLocation",ad.location);set("adContact",ad.whatsapp);set("adDescription",ad.description);set("adName",ad.seller_name);
+      $("descCount").textContent=ad.description.length+"/1000";
+    });
+    $("delBtn").addEventListener("click",async()=>{
+      if(!currentAd)return;const ad=currentAd,code=await getCode(ad);if(!code)return;
+      if(!confirm('Hapus iklan "'+ad.title+'" secara permanen?'))return;
+      try{const ok=await rpc("delete_ad",{p_id:ad.id,p_code:code});
+        if(!ok){dropMine(ad.id);showToast("Kode kelola salah atau iklan sudah tidak aktif.");return;}
+        dropMine(ad.id);closeDetail();await loadAds();showToast("Iklan dihapus.");
+      }catch(err){showToast("Gagal menghapus: "+friendlyError(err));}
+    });
+
+    const codeModal=$("codeModal");
+    $("doneCode").addEventListener("click",()=>closeLayer(codeModal));
+    $("copyCode").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("codeVal").textContent);showToast("Kode disalin.");}catch{showToast("Salin manual kode di layar.");}});
+
+    $("adForm").addEventListener("submit",async e=>{
+      e.preventDefault();
+      if($("adWebsite").value){closeModal();return;}
+      if(!isConfigured){showToast("Database belum dihubungkan. Lengkapi URL dan anon key Supabase dulu.");return;}
+      const ed=editing; // simpan referensi: modal bisa ditutup saat request berjalan
+      if(!ed){
+        if(!window.crypto||!crypto.subtle){showToast("Halaman harus dibuka lewat HTTPS agar kode kelola dapat dibuat.");return;}
+        try{const last=Number(localStorage.getItem("yana_last_post")||0);if(Date.now()-last<COOLDOWN){showToast("Tunggu beberapa menit sebelum memasang iklan lagi.");return;}}catch{}
+      }
+      const wa=normWA($("adContact").value);
+      if(!/^62[0-9]{8,13}$/.test(wa)){showToast("Nomor WhatsApp tidak valid. Contoh: 08123456789");return;}
+      const data={title:$("adTitle").value.trim(),category:$("adCategory").value,location:$("adLocation").value.trim(),whatsapp:wa,description:descEl.value.trim(),seller_name:$("adName").value.trim()};
+      if(data.title.length<3){showToast("Judul minimal 3 huruf.");return;}
+      if(data.location.length<2){showToast("Lokasi minimal 2 huruf.");return;}
+      if(data.seller_name.length<2){showToast("Nama pengiklan minimal 2 huruf.");return;}
+      if(data.description.length<5){showToast("Deskripsi minimal 5 karakter.");return;}
+      const priceInput=$("adPrice").value;
+      if(priceInput!==""&&(Number(priceInput)<0||Number(priceInput)>1e12)){showToast("Harga tidak valid.");return;}
+      data.price=priceInput===""?null:Math.round(Number(priceInput));
+      if(ed&&!ed.code){const c=await askCode();if(!c)return;ed.code=c;}
+      const btn=$("submitAdBtn");btn.disabled=true;btn.textContent="Mengirim…";
+      try{
+        if(ed){
+          const ok=await rpc("update_ad",{p_id:ed.ad.id,p_code:ed.code,p_title:data.title,p_category:data.category,p_price:data.price,p_location:data.location,p_whatsapp:data.whatsapp,p_description:data.description,p_seller_name:data.seller_name});
+          if(!ok){dropMine(ed.ad.id);ed.code=null;throw new Error("Kode kelola salah atau iklan sudah tidak aktif. Kirim lagi untuk memasukkan ulang kode.");}
+          saveMine(ed.ad.id,ed.code);
+          if(editing===ed){editing=null;setMode(false);closeModal();e.target.reset();$("descCount").textContent="0/1000";}
+          await loadAds();showToast("Perubahan disimpan.");
+        }else{
+          const code=newCode();
+          const res=await fetch(SUPABASE_URL+"/rest/v1/ads?select=id",{method:"POST",headers:supaHeaders({"Prefer":"return=representation"}),body:JSON.stringify({...data,manage_hash:await sha256(code)})});
+          if(!res.ok){let detail="HTTP "+res.status;try{detail=(await res.json()).message||detail;}catch{}throw new Error(detail);}
+          // Iklan sudah masuk: apa pun yang terjadi setelah ini, kode kelola harus tetap ditampilkan.
+          let row=null;try{row=(await res.json())[0];}catch{}
+          const saved=row?saveMine(row.id,code):false;
+          try{localStorage.setItem("yana_last_post",String(Date.now()));}catch{}
+          closeModal();e.target.reset();$("descCount").textContent="0/1000";
+          $("codeVal").textContent=code;
+          $("codeSavedNote").textContent=saved?"Kode juga tersimpan otomatis di browser ini, tetapi tetap catat di tempat lain.":"Browser ini tidak dapat menyimpan kode otomatis. Wajib catat sekarang.";
+          openLayer(codeModal,$("copyCode"));
+          loadAds();
+        }
+      }catch(err){showToast((ed?"Perubahan belum tersimpan: ":"Iklan belum terkirim: ")+friendlyError(err));}
+      finally{btn.disabled=false;btn.textContent=editing?"Simpan Perubahan":"Publikasikan Iklan";}
+    });
+
+    // ---------- Syarat, privasi, kontak ----------
+    // Draf awal: sesuaikan dengan kebijakan Anda dan konsultasikan ke ahli hukum bila perlu.
+    function legalContent(kind){
+      const mail=CONTACT_EMAIL.includes("ISI_")?"(email kontak belum diisi)":'<a href="mailto:'+escapeHTML(CONTACT_EMAIL)+'">'+escapeHTML(CONTACT_EMAIL)+'</a>';
+      if(kind==="syarat")return{t:"Syarat Penggunaan",h:`<p>YANA adalah media iklan baris gratis. YANA tidak menjadi pihak dalam transaksi dan tidak menjamin kebenaran isi iklan.</p>
+        <h3>Dilarang memasang</h3><ul><li>Penipuan, investasi bodong, atau skema uang berantai</li><li>Barang ilegal atau terlarang (narkotika, senjata, satwa dilindungi, dan sejenisnya)</li><li>Konten dewasa, ujaran kebencian, atau SARA</li><li>Data atau nomor pribadi orang lain tanpa izin</li><li>Iklan spam atau duplikat</li></ul>
+        <h3>Ketentuan lain</h3><ul><li>Iklan berlaku 30 hari, lalu disembunyikan otomatis.</li><li>Pengiklan bertanggung jawab atas isi iklan dan atas kerahasiaan kode kelola.</li><li>YANA dapat menghapus iklan yang melanggar tanpa pemberitahuan.</li></ul>`};
+      if(kind==="privasi")return{t:"Kebijakan Privasi",h:`<h3>Data yang kami simpan</h3><ul><li>Isi iklan: judul, deskripsi, harga, lokasi, nama pengiklan, dan nomor WhatsApp. <b>Semuanya tampil publik</b> selama iklan aktif.</li><li>Kode kelola dalam bentuk hash (kode aslinya tidak kami simpan).</li><li>Alamat IP dalam bentuk hash, hanya untuk mencegah spam dan tidak ditampilkan.</li><li>Laporan iklan yang Anda kirim.</li></ul>
+        <h3>Di browser Anda</h3><p>Browser menyimpan kode kelola iklan dan waktu pemasangan terakhir (localStorage). Kami tidak memakai cookie pelacak.</p>
+        <h3>Penyimpanan &amp; penghapusan</h3><p>Iklan kedaluwarsa atau yang dihapus dibersihkan secara berkala. Permintaan penghapusan data dapat dikirim ke ${mail}.</p>
+        <h3>Dasar pemrosesan</h3><p>Persetujuan Anda saat memasang iklan, sesuai UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi.</p>`};
+      return{t:"Kontak & Pelaporan",h:`<p>Menemukan iklan penipuan atau melanggar aturan? Buka iklannya lalu pakai tombol <b>Kirim laporan</b>.</p><p>Untuk hal lain (permintaan hapus data, keberatan, kerja sama), hubungi ${mail}. Sertakan tautan iklan bila terkait iklan tertentu (tombol <b>Bagikan iklan</b> di halaman detail).</p>`};
+    }
+    const legalModal=$("legalModal");
+    function openLegal(kind){const c=legalContent(kind);$("legalTitle").textContent=c.t;$("legalBody").innerHTML=c.h;openLayer(legalModal,$("closeLegal"));}
+    document.addEventListener("click",e=>{const b=e.target.closest("[data-legal]");if(b)openLegal(b.dataset.legal);});
+    $("closeLegal").addEventListener("click",()=>closeLayer(legalModal));
+    legalModal.addEventListener("click",e=>{if(e.target===legalModal)closeLayer(legalModal);});
+
+    // Esc menutup lapisan paling atas (kecuali dialog kode iklan baru, agar kode tidak terlewat)
+    document.addEventListener("keydown",e=>{
+      if(e.key!=="Escape")return;
+      if(legalModal.classList.contains("open"))return closeLayer(legalModal);
+      if(askModal.classList.contains("open"))return closeAsk(null);
+      if(modal.classList.contains("open"))return closeModal();
+      if(detailModal.classList.contains("open"))closeDetail();
+    });
+
+    // ---------- Iklan terbaru + carousel ----------
+    function renderLatest(){
+      const sec=$("latestSec"),box=$("latestStrip");
+      const ads=[...liveAds].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,10);
+      sec.hidden=!ads.length;
+      box.innerHTML=ads.map(ad=>`<button class="mini" data-latest="${escapeHTML(ad.id)}"><div class="mini-emoji">${emojiFor(ad.category)}</div><div class="mini-title">${escapeHTML(ad.title)}</div><div class="price" style="font-size:14px;margin:4px 0">${money(ad.price)}</div><div class="listing-meta"><span>📍 ${escapeHTML(ad.location)}</span></div></button>`).join("");
+    }
+    $("latestStrip").addEventListener("click",e=>{const b=e.target.closest("[data-latest]");if(b)openDetail(b.dataset.latest);});
+    (function(){
+      const box=$("slides"),slides=[...box.querySelectorAll(".slide")],dots=[...document.querySelectorAll("#dots button")],pauseBtn=$("pauseBtn");
+      let i=0,pause=0,userPaused=false;
+      const sync=()=>{dots.forEach((d,x)=>{d.classList.toggle("on",x===i);d.setAttribute("aria-current",x===i?"true":"false");});slides.forEach((s,x)=>{s.inert=x!==i;});};
+      const go=n=>{i=(n+dots.length)%dots.length;box.scrollTo({left:i*box.clientWidth,behavior:smooth()});};
+      box.addEventListener("scroll",()=>{const n=Math.round(box.scrollLeft/box.clientWidth);if(n!==i){i=n;sync();}});
+      dots.forEach((d,x)=>d.addEventListener("click",()=>{pause=Date.now()+10000;go(x);}));
+      ["pointerdown","touchstart","mouseenter","focusin"].forEach(ev=>box.addEventListener(ev,()=>{pause=Date.now()+10000;}));
+      if(matchMedia("(prefers-reduced-motion:reduce)").matches){pauseBtn.hidden=true;}
+      else{
+        setInterval(()=>{if(!userPaused&&Date.now()>pause&&!document.hidden)go(i+1);},5000);
+        pauseBtn.addEventListener("click",()=>{userPaused=!userPaused;pauseBtn.textContent=userPaused?"▶":"⏸";pauseBtn.setAttribute("aria-label",userPaused?"Lanjutkan geser otomatis":"Jeda geser otomatis");pauseBtn.setAttribute("aria-pressed",String(userPaused));});
+      }
+      sync();
+      document.querySelectorAll("[data-open-ad]").forEach(b=>b.addEventListener("click",openModal));
+      document.querySelectorAll("[data-cat]").forEach(b=>b.addEventListener("click",()=>{const c=document.querySelector('.cat[data-category="'+b.dataset.cat+'"]');if(c)c.click();}));
+    })();
+    $("year").textContent=new Date().getFullYear();
+    loadAds().then(openFromHash);
+  </script>
+</body>
+</html>
