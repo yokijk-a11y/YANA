@@ -127,6 +127,7 @@
     @media(max-width:650px){.carousel{padding:6px 15px 0}.slide{padding:20px 18px;min-height:0}.slide-art{display:none}.slide h2{font-size:23px}.slide p{font-size:13px;margin-bottom:12px}.mini{flex-basis:140px}}
     [hidden]{display:none!important}
     .toolbar select{max-width:100%;flex:1 1 150px}.toolbar select:disabled{opacity:.55}
+    .field select:disabled{background:#f1f4f2;color:#7a877f;cursor:not-allowed}
     .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
     #iklan{scroll-margin-top:96px}
     @media(max-width:650px){#iklan{scroll-margin-top:132px}}
@@ -375,7 +376,7 @@ const WILAYAH={
 };
 const regLabels = p => WILAYAH[p] ? [...WILAYAH[p].kab.map(n=>"Kab. "+n), ...WILAYAH[p].kota.map(n=>"Kota "+n)] : [];
 function fillProv(sel,first){sel.innerHTML="";sel.add(new Option(first,""));Object.keys(WILAYAH).forEach(p=>sel.add(new Option(p,p)));}
-function fillReg(sel,prov,first){sel.innerHTML="";sel.add(new Option(first,""));regLabels(prov).forEach(r=>sel.add(new Option(r,r)));sel.disabled=!prov;}
+function fillReg(sel,prov,first,idle){sel.innerHTML="";sel.add(new Option(prov?first:(idle||first),""));regLabels(prov).forEach(r=>sel.add(new Option(r,r)));sel.disabled=!prov;}
 const canonProv = l => {const i=String(l).lastIndexOf(", ");if(i<0)return null;const p=l.slice(i+2);return WILAYAH[p]?p:null;};
 const shortLoc = l => canonProv(l) ? l.slice(0,l.lastIndexOf(", ")) : l;
 // Iklan lama dengan lokasi ketikan bebas (mis. "kota jogja") dicocokkan secara longgar
@@ -571,7 +572,8 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
     });
     let searchTimer;$("searchInput").addEventListener("input",e=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{searchTerm=e.target.value.trim().toLowerCase();renderListings();},250);});
     $("searchForm").addEventListener("submit",e=>{e.preventDefault();searchTerm=$("searchInput").value.trim().toLowerCase();renderListings();scrollToList();});
-    provFilter.addEventListener("change",()=>{fillReg(kabFilter,provFilter.value,"Semua kab./kota");renderListings();});
+    const onProvFilter=()=>{fillReg(kabFilter,provFilter.value,"Semua kab./kota");renderListings();};
+    provFilter.addEventListener("change",onProvFilter);provFilter.addEventListener("input",onProvFilter);
     kabFilter.addEventListener("change",renderListings);sortFilter.addEventListener("change",renderListings);
     $("clearFilters").addEventListener("click",()=>{searchTerm="";$("searchInput").value="";provFilter.value="";fillReg(kabFilter,"","Semua kab./kota");sortFilter.value="new";setActiveCat("Semua");renderListings();});
 
@@ -594,13 +596,14 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
     ["closeModal","cancelModal"].forEach(id=>$(id).addEventListener("click",closeModal));
     modal.addEventListener("click",e=>{if(e.target===modal)closeModal();});
     fillProv(provFilter,"Semua provinsi");fillReg(kabFilter,"","Semua kab./kota");
-    fillProv($("adProv"),"Pilih provinsi");fillReg($("adKab"),"","Pilih kabupaten/kota");
-    $("adProv").addEventListener("change",()=>fillReg($("adKab"),$("adProv").value,"Pilih kabupaten/kota"));
-    $("adForm").addEventListener("reset",()=>setTimeout(()=>fillReg($("adKab"),"","Pilih kabupaten/kota"),0));
+    fillProv($("adProv"),"Pilih provinsi");fillReg($("adKab"),"","Pilih kabupaten/kota","Pilih provinsi dulu");
+    const onAdProv=()=>fillReg($("adKab"),$("adProv").value,"Pilih kabupaten/kota","Pilih provinsi dulu");
+    $("adProv").addEventListener("change",onAdProv);$("adProv").addEventListener("input",onAdProv);
+    $("adForm").addEventListener("reset",()=>setTimeout(()=>fillReg($("adKab"),"","Pilih kabupaten/kota","Pilih provinsi dulu"),0));
     function prefillLocation(loc){
       const prov=canonProv(loc);
-      if(prov){const reg=loc.slice(0,loc.lastIndexOf(", "));if(regLabels(prov).includes(reg)){$("adProv").value=prov;fillReg($("adKab"),prov,"Pilih kabupaten/kota");$("adKab").value=reg;return;}}
-      $("adProv").value="";fillReg($("adKab"),"","Pilih kabupaten/kota");
+      if(prov){const reg=loc.slice(0,loc.lastIndexOf(", "));if(regLabels(prov).includes(reg)){$("adProv").value=prov;fillReg($("adKab"),prov,"Pilih kabupaten/kota","Pilih provinsi dulu");$("adKab").value=reg;return;}}
+      $("adProv").value="";fillReg($("adKab"),"","Pilih kabupaten/kota","Pilih provinsi dulu");
       showToast('Lokasi lama "'+loc+'" perlu dipilih ulang dari daftar.');
     }
     const descEl=$("adDescription");
