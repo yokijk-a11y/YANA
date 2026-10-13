@@ -163,6 +163,14 @@
     .cta .btn:hover{filter:brightness(1.07)}
     footer{border-top:3px solid;border-image:var(--gold) 1}
     .section-head h2::after{content:"";display:block;width:34px;height:3px;border-radius:2px;background:var(--gold);margin-top:6px}
+    .listing-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.listing-img .badge{z-index:1}
+    .thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.thumb{position:relative;width:68px;height:68px;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#f1f4f2}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}.thumb button{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;border:0;background:#000b;color:#fff;font-size:14px;line-height:1;padding:0}
+    .photo-actions{display:flex;align-items:center;gap:10px}.photo-actions .count{margin:0}
+    .gallery{margin:4px 0 12px}.g-main{width:100%;aspect-ratio:4/3;object-fit:contain;background:#f1f4f2;border-radius:12px;display:block;cursor:zoom-in}
+    .g-thumbs{display:flex;gap:6px;margin-top:6px;overflow-x:auto;padding-bottom:2px}.g-thumbs img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:2px solid transparent;flex:none;cursor:pointer}.g-thumbs img.on{border-color:var(--gold-solid)}
+    .mini-img{width:100%;height:84px;object-fit:cover;border-radius:10px;margin-bottom:6px;display:block;background:#f1f4f2}
+    .upstat{font-size:13px;font-weight:700;color:var(--green);text-align:center;margin:10px 0 0;min-height:18px}
   </style>
 </head>
 <body>
@@ -263,6 +271,11 @@
       <div class="notice" id="formNotice">Iklan berlaku 30 hari. Jangan mencantumkan data rahasia. Iklan yang dikirim langsung tampil dan dapat dilihat publik. Nomor WhatsApp boleh diawali 08 atau 62.</div>
       <form id="adForm">
         <div class="form-grid">
+          <div class="field full" id="photoRow"><label for="addPhotoBtn">Foto (opsional, maksimal 5)</label>
+            <input type="file" id="photoInput" accept="image/*" multiple hidden>
+            <div class="photo-actions"><button type="button" class="btn btn-outline" id="addPhotoBtn">📷 Tambah foto</button><span class="count" id="photoCount">0/5</span></div>
+            <div class="thumbs" id="thumbs"></div>
+            <div class="count" style="text-align:left">Foto diperkecil otomatis dan data lokasi (EXIF) dibuang. Foto tidak bisa diubah setelah iklan terbit. Jangan unggah foto berisi data pribadi.</div></div>
           <div class="field full"><label for="adTitle">Judul iklan *</label><input id="adTitle" required minlength="3" maxlength="90" placeholder="Contoh: Sepeda lipat kondisi bagus"></div>
           <div class="field"><label for="adCategory">Kategori *</label><select id="adCategory" required><option value="">Pilih kategori</option><option>Kendaraan</option><option>Properti</option><option>Elektronik</option><option>Rumah Tangga</option><option>Jasa</option><option>Lowongan Kerja</option><option>Lainnya</option></select></div>
           <div class="field"><label for="adPrice">Harga (Rp)</label><input id="adPrice" type="number" min="0" placeholder="0 jika gratis/nego"></div>
@@ -281,6 +294,7 @@
   <div class="modal" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="dTitle">
     <div class="modal-box">
       <div class="modal-head"><h2 id="dTitle"></h2><button class="close" id="closeDetail" aria-label="Tutup">×</button></div>
+      <div class="gallery" id="dGallery" hidden></div>
       <div class="price" id="dPrice"></div>
       <div class="d-meta" id="dMeta"></div>
       <p class="d-desc" id="dDesc"></p>
@@ -298,6 +312,7 @@
       <div class="modal-head"><h2 id="cTitle">Iklan terbit! Simpan kode ini</h2></div>
       <div class="notice">Kode ini satu-satunya cara untuk mengedit atau menghapus iklanmu. Kode tidak dapat dipulihkan. <span id="codeSavedNote"></span></div>
       <div class="price" id="codeVal" style="font-size:28px;letter-spacing:3px;text-align:center"></div>
+      <div class="upstat" id="upStat" aria-live="polite"></div>
       <div class="form-actions"><button class="btn btn-outline" id="copyCode" type="button">Salin kode</button><button class="btn btn-primary" id="doneCode" type="button">Saya sudah menyimpan</button></div>
     </div>
   </div>
@@ -328,7 +343,9 @@
     const isConfigured = SUPABASE_URL.startsWith("https://") && !SUPABASE_URL.includes("ISI_") && !SUPABASE_ANON_KEY.includes("ISI_");
 
     const $ = id => document.getElementById(id);
-    const AD_COLS = "id,title,category,price,location,whatsapp,description,seller_name,created_at,expires_at";
+    const AD_COLS_BASE = "id,title,category,price,location,whatsapp,description,seller_name,created_at,expires_at";
+    const AD_COLS = AD_COLS_BASE + ",photo_count";
+    let colsNow = AD_COLS, photosOK = true;
     const SERVER_PAGE = 300;
     let liveAds = [], totalAds = null, serverHasMore = false;
     let activeCategory = "Semua", searchTerm = "";
@@ -436,6 +453,80 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
     let toastTimer;
     function showToast(message){const t=$("toast");t.textContent=message;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),5000);}
 
+    // ---------- Foto iklan ----------
+    const MAX_PHOTOS = 5;
+    let photos = []; // {blob,url} — hanya untuk iklan baru
+    const photoUrl = (id,n) => SUPABASE_URL + "/storage/v1/object/public/ad-photos/" + id + "/" + n + ".jpg";
+    async function decodeImage(file){
+      if(window.createImageBitmap){
+        try{return await createImageBitmap(file,{imageOrientation:"from-image"});}catch{}
+        try{return await createImageBitmap(file);}catch{}
+      }
+      return await new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);res(im);};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error("decode"));};im.src=u;});
+    }
+    // Perkecil ke maks 1280px, simpan ulang sebagai JPEG (metadata EXIF/lokasi otomatis hilang), target <= 450 KB
+    async function compressImage(file){
+      if(file.size>30*1024*1024)throw new Error("size");
+      const img=await decodeImage(file);
+      try{
+        const w0=img.width||img.naturalWidth,h0=img.height||img.naturalHeight;
+        if(!w0||!h0)throw new Error("dim");
+        let max=1280,q=0.82;
+        for(let i=0;i<8;i++){
+          const sc=Math.min(1,max/Math.max(w0,h0));
+          const c=document.createElement("canvas");c.width=Math.max(1,Math.round(w0*sc));c.height=Math.max(1,Math.round(h0*sc));
+          const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);
+          const blob=await new Promise(r=>c.toBlob(r,"image/jpeg",q));
+          if(blob&&blob.size<=450*1024)return blob;
+          if(q>0.55)q-=0.1;else max=Math.round(max*0.8);
+        }
+        throw new Error("big");
+      }finally{if(img.close)img.close();}
+    }
+    function renderThumbs(){
+      const t=$("thumbs");t.innerHTML="";
+      photos.forEach((p,i)=>{
+        const d=document.createElement("div");d.className="thumb";
+        const im=document.createElement("img");im.src=p.url;im.alt="Foto "+(i+1);
+        const b=document.createElement("button");b.type="button";b.textContent="×";b.setAttribute("aria-label","Hapus foto "+(i+1));
+        b.addEventListener("click",()=>{URL.revokeObjectURL(p.url);photos.splice(i,1);renderThumbs();});
+        d.append(im,b);t.appendChild(d);
+      });
+      $("photoCount").textContent=photos.length+"/"+MAX_PHOTOS;
+      $("addPhotoBtn").disabled=photos.length>=MAX_PHOTOS;
+    }
+    function clearPhotos(){photos.forEach(p=>URL.revokeObjectURL(p.url));photos=[];renderThumbs();}
+    async function uploadPhoto(adId,n,blob){
+      const ctrl=new AbortController(),t=setTimeout(()=>ctrl.abort(),45000);
+      try{
+        const res=await fetch(SUPABASE_URL+"/storage/v1/object/ad-photos/"+adId+"/"+n+".jpg",{method:"POST",headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY,"Content-Type":"image/jpeg"},body:blob,signal:ctrl.signal});
+        return res.ok;
+      }catch{return false;}finally{clearTimeout(t);}
+    }
+    async function uploadAll(id,code,list){
+      const st=$("upStat");let ok=0;
+      for(let i=0;i<list.length;i++){
+        st.textContent="Mengunggah foto "+(i+1)+" dari "+list.length+"… jangan tutup halaman";
+        if(await uploadPhoto(id,i+1,list[i].blob))ok++;else break;
+      }
+      let saved=0;
+      if(ok>0){try{saved=await rpc("set_ad_photos",{p_id:id,p_code:code,p_count:ok});}catch{saved=0;}}
+      st.textContent=saved>0&&saved===list.length?"✓ "+saved+" foto berhasil diunggah.":saved>0?"Hanya "+saved+" dari "+list.length+" foto yang berhasil diunggah.":"Foto gagal diunggah. Iklan tetap terbit tanpa foto.";
+      await loadAds();
+    }
+    // Pembersihan otomatis: iklan kedaluwarsa dibuang di database, fotonya dihapus lewat Storage API (maks 1x / 6 jam / browser)
+    async function runCleanup(){
+      if(!isConfigured||!photosOK)return;
+      try{const last=Number(localStorage.getItem("yana_cleanup")||0);if(Date.now()-last<6*36e5)return;localStorage.setItem("yana_cleanup",String(Date.now()));}catch{}
+      try{
+        const paths=await rpc("cleanup_expired",{});
+        if(!Array.isArray(paths))return;
+        for(const p of paths){
+          try{await fetch(SUPABASE_URL+"/storage/v1/object/ad-photos/"+String(p).split("/").map(encodeURIComponent).join("/"),{method:"DELETE",headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY}});}catch{}
+        }
+      }catch{}
+    }
+
     // ---------- Muat iklan ----------
     async function loadAds(more=false){
       if(!isConfigured){
@@ -447,8 +538,10 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
       if(!more) grid.innerHTML = '<div class="skel"></div>'.repeat(4);
       try {
         const offset = more ? liveAds.length : 0;
-        const url = SUPABASE_URL + "/rest/v1/ads?select="+AD_COLS+"&expires_at=gt."+encodeURIComponent(new Date().toISOString())+"&order=created_at.desc&limit="+SERVER_PAGE+"&offset="+offset;
-        const res = await fetch(url,{headers:supaHeaders({"Prefer":"count=exact"})});
+        const mkUrl = () => SUPABASE_URL + "/rest/v1/ads?select="+colsNow+"&expires_at=gt."+encodeURIComponent(new Date().toISOString())+"&order=created_at.desc&limit="+SERVER_PAGE+"&offset="+offset;
+        let res = await fetch(mkUrl(),{headers:supaHeaders({"Prefer":"count=exact"})});
+        // SQL v5 (kolom photo_count) belum dijalankan -> tetap tampilkan iklan tanpa fitur foto
+        if(!res.ok && res.status===400 && photosOK){photosOK=false;colsNow=AD_COLS_BASE;$("photoRow").hidden=true;res=await fetch(mkUrl(),{headers:supaHeaders({"Prefer":"count=exact"})});}
         if(!res.ok) throw new Error("Database mengembalikan status "+res.status);
         const rows = await res.json();
         const cr = res.headers.get("Content-Range"), tot = cr ? cr.split("/")[1] : null;
@@ -490,7 +583,7 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
       grid.innerHTML=ads.slice(0,shown).map(ad=>{
         const fresh=Date.now()-new Date(ad.created_at)<48*36e5;
         return `<article class="listing">
-          <div class="listing-img"><span class="badge">${fresh?"BARU":escapeHTML(ad.category).toUpperCase()}</span>${emojiFor(ad.category)}</div>
+          <div class="listing-img"><span class="badge">${fresh?"BARU":escapeHTML(ad.category).toUpperCase()}</span>${emojiFor(ad.category)}${Number(ad.photo_count)>0?`<img src="${escapeHTML(photoUrl(ad.id,1))}" alt="" loading="lazy" onerror="this.remove()">`:""}</div>
           <div class="listing-body">
             <div class="listing-title">${escapeHTML(ad.title)}</div>
             <div class="price">${money(ad.price)}</div>
@@ -520,6 +613,17 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
       const n=normWA(ad.whatsapp);
       $("dWA").href="https://wa.me/"+n+"?text="+encodeURIComponent("Halo, saya melihat iklan \""+ad.title+"\" di YANA. Apakah masih tersedia?");
       $("reportReason").value="";
+      const g=$("dGallery"),np=Math.min(5,Number(ad.photo_count)||0);g.innerHTML="";
+      if(np>0){
+        const main=document.createElement("img");main.className="g-main";main.alt="Foto "+ad.title;main.src=photoUrl(ad.id,1);
+        main.addEventListener("click",()=>window.open(main.src,"_blank","noopener"));
+        g.appendChild(main);
+        if(np>1){const row=document.createElement("div");row.className="g-thumbs";
+          for(let n=1;n<=np;n++){const t=document.createElement("img");t.src=photoUrl(ad.id,n);t.alt="Foto "+n;t.loading="lazy";if(n===1)t.className="on";
+            t.addEventListener("click",()=>{main.src=photoUrl(ad.id,n);row.querySelectorAll("img").forEach(x=>x.classList.toggle("on",x===t));});row.appendChild(t);}
+          g.appendChild(row);}
+        g.hidden=false;
+      }else g.hidden=true;
       const owned=!!mine()[ad.id];
       $("ownerBar").hidden=!owned; $("ownerToggle").hidden=owned;
       openLayer(detailModal,$("closeDetail"));
@@ -534,7 +638,7 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
       const id=m[1].toLowerCase();
       if(currentAd&&String(currentAd.id)===id&&detailModal.classList.contains("open"))return;
       let ad=liveAds.find(a=>String(a.id)===id);
-      if(!ad){try{const res=await fetch(SUPABASE_URL+"/rest/v1/ads?select="+AD_COLS+"&id=eq."+id+"&expires_at=gt."+encodeURIComponent(new Date().toISOString()),{headers:supaHeaders()});if(res.ok)ad=(await res.json())[0];}catch{}}
+      if(!ad){try{const res=await fetch(SUPABASE_URL+"/rest/v1/ads?select="+colsNow+"&id=eq."+id+"&expires_at=gt."+encodeURIComponent(new Date().toISOString()),{headers:supaHeaders()});if(res.ok)ad=(await res.json())[0];}catch{}}
       if(!ad){showToast("Iklan tidak ditemukan atau sudah kedaluwarsa.");try{history.replaceState(null,"",location.pathname+location.search);}catch{}return;}
       showAd(ad);
     }
@@ -581,7 +685,7 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
     const modal=$("adModal");
     const NOTICE_NEW=$("formNotice").textContent;
     let editing=null;
-    function openModal(){openLayer(modal,$("adTitle"));}
+    function openModal(){openLayer(modal,$("closeModal"));}
     function closeModal(){
       if(editing){editing=null;setMode(false);$("adForm").reset();$("descCount").textContent="0/1000";}
       closeLayer(modal);
@@ -589,8 +693,8 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
     function setMode(edit){
       $("modalTitle").textContent=edit?"Edit Iklan":"Pasang Iklan Gratis";
       $("submitAdBtn").textContent=edit?"Simpan Perubahan":"Publikasikan Iklan";
-      $("formNotice").textContent=edit?"Perbarui informasi iklan. Masa berlaku iklan tidak berubah. Nomor WhatsApp boleh diawali 08 atau 62.":NOTICE_NEW;
-      $("agreeRow").hidden=edit;$("adAgree").required=!edit;
+      $("formNotice").textContent=edit?"Perbarui informasi iklan. Masa berlaku iklan tidak berubah. Foto tidak dapat diubah (hapus lalu pasang ulang bila perlu). Nomor WhatsApp boleh diawali 08 atau 62.":NOTICE_NEW;
+      $("agreeRow").hidden=edit;$("adAgree").required=!edit;$("photoRow").hidden=edit||!photosOK;
     }
     ["openAdTop","openAdHero","openAdBottom"].forEach(id=>$(id).addEventListener("click",openModal));
     ["closeModal","cancelModal"].forEach(id=>$(id).addEventListener("click",closeModal));
@@ -606,6 +710,21 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
       $("adProv").value="";fillReg($("adKab"),"","Pilih kabupaten/kota","Pilih provinsi dulu");
       showToast('Lokasi lama "'+loc+'" perlu dipilih ulang dari daftar.');
     }
+    $("addPhotoBtn").addEventListener("click",()=>$("photoInput").click());
+    $("photoInput").addEventListener("change",async e=>{
+      const files=[...e.target.files];e.target.value="";
+      const btn=$("addPhotoBtn");btn.disabled=true;btn.textContent="Memproses…";
+      let skipped=0;
+      for(const f of files){
+        if(photos.length>=MAX_PHOTOS){skipped++;continue;}
+        if(!/^image\//.test(f.type)){showToast("Bukan file gambar: "+f.name);continue;}
+        try{const blob=await compressImage(f);photos.push({blob,url:URL.createObjectURL(blob)});renderThumbs();}
+        catch{showToast("Foto tidak dapat diproses: "+f.name);}
+      }
+      if(skipped)showToast("Maksimal "+MAX_PHOTOS+" foto per iklan.");
+      btn.textContent="📷 Tambah foto";renderThumbs();
+    });
+    $("adForm").addEventListener("reset",()=>setTimeout(clearPhotos,0));
     const descEl=$("adDescription");
     descEl.addEventListener("input",()=>$("descCount").textContent=descEl.value.length+"/1000");
 
@@ -679,6 +798,7 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
           await loadAds();showToast("Perubahan disimpan.");
         }else{
           const code=newCode();
+          const queued=photosOK?photos.slice():[];
           const res=await fetch(SUPABASE_URL+"/rest/v1/ads?select=id",{method:"POST",headers:supaHeaders({"Prefer":"return=representation"}),body:JSON.stringify({...data,manage_hash:await sha256(code)})});
           if(!res.ok){let detail="HTTP "+res.status;try{detail=(await res.json()).message||detail;}catch{}throw new Error(detail);}
           // Iklan sudah masuk: apa pun yang terjadi setelah ini, kode kelola harus tetap ditampilkan.
@@ -688,8 +808,9 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
           closeModal();e.target.reset();$("descCount").textContent="0/1000";
           $("codeVal").textContent=code;
           $("codeSavedNote").textContent=saved?"Kode juga tersimpan otomatis di browser ini, tetapi tetap catat di tempat lain.":"Browser ini tidak dapat menyimpan kode otomatis. Wajib catat sekarang.";
+          $("upStat").textContent=(row&&queued.length)?"Menyiapkan unggah foto…":"";
           openLayer(codeModal,$("copyCode"));
-          loadAds();
+          if(row&&queued.length)uploadAll(row.id,code,queued).catch(()=>{});else loadAds();
         }
       }catch(err){showToast((ed?"Perubahan belum tersimpan: ":"Iklan belum terkirim: ")+friendlyError(err));}
       finally{btn.disabled=false;btn.textContent=editing?"Simpan Perubahan":"Publikasikan Iklan";}
@@ -700,9 +821,9 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
     function legalContent(kind){
       const mail=CONTACT_EMAIL.includes("ISI_")?"(email kontak belum diisi)":'<a href="mailto:'+escapeHTML(CONTACT_EMAIL)+'">'+escapeHTML(CONTACT_EMAIL)+'</a>';
       if(kind==="syarat")return{t:"Syarat Penggunaan",h:`<p>YANA adalah media iklan baris gratis. YANA tidak menjadi pihak dalam transaksi dan tidak menjamin kebenaran isi iklan.</p>
-        <h3>Dilarang memasang</h3><ul><li>Penipuan, investasi bodong, atau skema uang berantai</li><li>Barang ilegal atau terlarang (narkotika, senjata, satwa dilindungi, dan sejenisnya)</li><li>Konten dewasa, ujaran kebencian, atau SARA</li><li>Data atau nomor pribadi orang lain tanpa izin</li><li>Iklan spam atau duplikat</li></ul>
+        <h3>Dilarang memasang</h3><ul><li>Penipuan, investasi bodong, atau skema uang berantai</li><li>Barang ilegal atau terlarang (narkotika, senjata, satwa dilindungi, dan sejenisnya)</li><li>Konten dewasa, ujaran kebencian, atau SARA</li><li>Data atau nomor pribadi orang lain tanpa izin</li><li>Iklan spam atau duplikat</li><li>Foto yang melanggar hukum, tidak senonoh, atau memuat orang lain tanpa izin</li></ul>
         <h3>Ketentuan lain</h3><ul><li>Iklan berlaku 30 hari, lalu disembunyikan otomatis.</li><li>Pengiklan bertanggung jawab atas isi iklan dan atas kerahasiaan kode kelola.</li><li>YANA dapat menghapus iklan yang melanggar tanpa pemberitahuan.</li></ul>`};
-      if(kind==="privasi")return{t:"Kebijakan Privasi",h:`<h3>Data yang kami simpan</h3><ul><li>Isi iklan: judul, deskripsi, harga, lokasi, nama pengiklan, dan nomor WhatsApp. <b>Semuanya tampil publik</b> selama iklan aktif.</li><li>Kode kelola dalam bentuk hash (kode aslinya tidak kami simpan).</li><li>Alamat IP dalam bentuk hash, hanya untuk mencegah spam dan tidak ditampilkan.</li><li>Laporan iklan yang Anda kirim.</li></ul>
+      if(kind==="privasi")return{t:"Kebijakan Privasi",h:`<h3>Data yang kami simpan</h3><ul><li>Isi iklan: judul, deskripsi, harga, lokasi, nama pengiklan, dan nomor WhatsApp. <b>Semuanya tampil publik</b> selama iklan aktif.</li><li>Kode kelola dalam bentuk hash (kode aslinya tidak kami simpan).</li><li>Alamat IP dalam bentuk hash, hanya untuk mencegah spam dan tidak ditampilkan.</li><li>Foto iklan (maksimal 5). Foto tampil publik, data lokasi di dalam foto (EXIF) dibuang, dan foto dihapus otomatis setelah iklan berakhir atau dihapus.</li><li>Laporan iklan yang Anda kirim.</li></ul>
         <h3>Di browser Anda</h3><p>Browser menyimpan kode kelola iklan dan waktu pemasangan terakhir (localStorage). Kami tidak memakai cookie pelacak.</p>
         <h3>Penyimpanan &amp; penghapusan</h3><p>Iklan kedaluwarsa atau yang dihapus dibersihkan secara berkala. Permintaan penghapusan data dapat dikirim ke ${mail}.</p>
         <h3>Dasar pemrosesan</h3><p>Persetujuan Anda saat memasang iklan, sesuai UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi.</p>`};
@@ -728,7 +849,7 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
       const sec=$("latestSec"),box=$("latestStrip");
       const ads=[...liveAds].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,10);
       sec.hidden=!ads.length;
-      box.innerHTML=ads.map(ad=>`<button class="mini" data-latest="${escapeHTML(ad.id)}"><div class="mini-emoji">${emojiFor(ad.category)}</div><div class="mini-title">${escapeHTML(ad.title)}</div><div class="price" style="font-size:14px;margin:4px 0">${money(ad.price)}</div><div class="listing-meta"><span>📍 ${escapeHTML(shortLoc(ad.location))}</span></div></button>`).join("");
+      box.innerHTML=ads.map(ad=>`<button class="mini" data-latest="${escapeHTML(ad.id)}">${Number(ad.photo_count)>0?`<img class="mini-img" src="${escapeHTML(photoUrl(ad.id,1))}" alt="" loading="lazy" onerror="this.remove()">`:`<div class="mini-emoji">${emojiFor(ad.category)}</div>`}<div class="mini-title">${escapeHTML(ad.title)}</div><div class="price" style="font-size:14px;margin:4px 0">${money(ad.price)}</div><div class="listing-meta"><span>📍 ${escapeHTML(shortLoc(ad.location))}</span></div></button>`).join("");
     }
     $("latestStrip").addEventListener("click",e=>{const b=e.target.closest("[data-latest]");if(b)openDetail(b.dataset.latest);});
     (function(){
@@ -749,7 +870,8 @@ const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Nu
       document.querySelectorAll("[data-cat]").forEach(b=>b.addEventListener("click",()=>{const c=document.querySelector('.cat[data-category="'+b.dataset.cat+'"]');if(c)c.click();}));
     })();
     $("year").textContent=new Date().getFullYear();
-    loadAds().then(openFromHash);
+    renderThumbs();
+    loadAds().then(()=>{openFromHash();setTimeout(runCleanup,4000);});
   </script>
 </body>
 </html>
