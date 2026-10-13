@@ -126,6 +126,7 @@
     .mini-emoji{font-size:34px;margin-bottom:6px}.mini-title{font-size:13px;font-weight:750;line-height:1.35;height:35px;overflow:hidden}
     @media(max-width:650px){.carousel{padding:6px 15px 0}.slide{padding:20px 18px;min-height:0}.slide-art{display:none}.slide h2{font-size:23px}.slide p{font-size:13px;margin-bottom:12px}.mini{flex-basis:140px}}
     [hidden]{display:none!important}
+    .toolbar select{max-width:100%;flex:1 1 150px}.toolbar select:disabled{opacity:.55}
     .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
     #iklan{scroll-margin-top:96px}
     @media(max-width:650px){#iklan{scroll-margin-top:132px}}
@@ -218,9 +219,8 @@
         <button class="btn btn-outline" id="clearFilters">↺ Reset pencarian</button>
       </div>
       <div class="toolbar">
-        <select id="locationFilter" aria-label="Filter lokasi">
-          <option value="">Semua lokasi</option><option>Yogyakarta</option><option>Bantul</option><option>Sleman</option><option>Jakarta</option><option>Bandung</option><option>Surabaya</option><option>Lainnya</option>
-        </select>
+        <select id="provFilter" aria-label="Filter provinsi"></select>
+        <select id="kabFilter" aria-label="Filter kabupaten atau kota" disabled></select>
         <select id="sortFilter" aria-label="Urutkan iklan">
           <option value="new">Terbaru</option><option value="low">Harga terendah</option><option value="high">Harga tertinggi</option>
         </select>
@@ -265,8 +265,9 @@
           <div class="field full"><label for="adTitle">Judul iklan *</label><input id="adTitle" required minlength="3" maxlength="90" placeholder="Contoh: Sepeda lipat kondisi bagus"></div>
           <div class="field"><label for="adCategory">Kategori *</label><select id="adCategory" required><option value="">Pilih kategori</option><option>Kendaraan</option><option>Properti</option><option>Elektronik</option><option>Rumah Tangga</option><option>Jasa</option><option>Lowongan Kerja</option><option>Lainnya</option></select></div>
           <div class="field"><label for="adPrice">Harga (Rp)</label><input id="adPrice" type="number" min="0" placeholder="0 jika gratis/nego"></div>
-          <div class="field"><label for="adLocation">Kota / kabupaten *</label><input id="adLocation" required minlength="2" maxlength="60" placeholder="Contoh: Bantul"></div>
-          <div class="field"><label for="adContact">WhatsApp *</label><input id="adContact" required inputmode="tel" placeholder="Contoh: 08123456789"></div>
+          <div class="field"><label for="adProv">Provinsi *</label><select id="adProv" required></select></div>
+          <div class="field"><label for="adKab">Kabupaten / kota *</label><select id="adKab" required disabled></select></div>
+          <div class="field full"><label for="adContact">WhatsApp *</label><input id="adContact" required inputmode="tel" placeholder="Contoh: 08123456789"></div>
           <div class="field full"><label for="adDescription">Deskripsi *</label><textarea id="adDescription" required minlength="5" maxlength="1000" placeholder="Jelaskan kondisi, ukuran, layanan, atau persyaratan..."></textarea><div class="count" id="descCount">0/1000</div></div>
           <div class="hp" aria-hidden="true"><label>Website<input id="adWebsite" tabindex="-1" autocomplete="off"></label></div>
           <div class="field full"><label for="adName">Nama pengiklan *</label><input id="adName" required minlength="2" maxlength="60" placeholder="Nama yang ingin ditampilkan"></div>
@@ -330,8 +331,63 @@
     const SERVER_PAGE = 300;
     let liveAds = [], totalAds = null, serverHasMore = false;
     let activeCategory = "Semua", searchTerm = "";
-    const grid = $("listingGrid"), count = $("resultCount"), locationFilter = $("locationFilter"), sortFilter = $("sortFilter");
-    const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Number(n).toLocaleString("id-ID");
+    const grid = $("listingGrid"), count = $("resultCount"), provFilter = $("provFilter"), kabFilter = $("kabFilter"), sortFilter = $("sortFilter");
+    // ---------- Wilayah: 38 provinsi, 416 kabupaten, 98 kota ----------
+const WILAYAH={
+  "Aceh":{kab:["Aceh Barat", "Aceh Barat Daya", "Aceh Besar", "Aceh Jaya", "Aceh Selatan", "Aceh Singkil", "Aceh Tamiang", "Aceh Tengah", "Aceh Tenggara", "Aceh Timur", "Aceh Utara", "Bener Meriah", "Bireuen", "Gayo Lues", "Nagan Raya", "Pidie", "Pidie Jaya", "Simeulue"],kota:["Banda Aceh", "Langsa", "Lhokseumawe", "Sabang", "Subulussalam"]},
+  "Sumatera Utara":{kab:["Asahan", "Batu Bara", "Dairi", "Deli Serdang", "Humbang Hasundutan", "Karo", "Labuhanbatu", "Labuhanbatu Selatan", "Labuhanbatu Utara", "Langkat", "Mandailing Natal", "Nias", "Nias Barat", "Nias Selatan", "Nias Utara", "Padang Lawas", "Padang Lawas Utara", "Pakpak Bharat", "Samosir", "Serdang Bedagai", "Simalungun", "Tapanuli Selatan", "Tapanuli Tengah", "Tapanuli Utara", "Toba"],kota:["Binjai", "Gunungsitoli", "Medan", "Padangsidimpuan", "Pematangsiantar", "Sibolga", "Tanjungbalai", "Tebing Tinggi"]},
+  "Sumatera Barat":{kab:["Agam", "Dharmasraya", "Kepulauan Mentawai", "Lima Puluh Kota", "Padang Pariaman", "Pasaman", "Pasaman Barat", "Pesisir Selatan", "Sijunjung", "Solok", "Solok Selatan", "Tanah Datar"],kota:["Bukittinggi", "Padang", "Padang Panjang", "Pariaman", "Payakumbuh", "Sawahlunto", "Solok"]},
+  "Riau":{kab:["Bengkalis", "Indragiri Hilir", "Indragiri Hulu", "Kampar", "Kepulauan Meranti", "Kuantan Singingi", "Pelalawan", "Rokan Hilir", "Rokan Hulu", "Siak"],kota:["Dumai", "Pekanbaru"]},
+  "Jambi":{kab:["Batanghari", "Bungo", "Kerinci", "Merangin", "Muaro Jambi", "Sarolangun", "Tanjung Jabung Barat", "Tanjung Jabung Timur", "Tebo"],kota:["Jambi", "Sungai Penuh"]},
+  "Sumatera Selatan":{kab:["Banyuasin", "Empat Lawang", "Lahat", "Muara Enim", "Musi Banyuasin", "Musi Rawas", "Musi Rawas Utara", "Ogan Ilir", "Ogan Komering Ilir", "Ogan Komering Ulu", "Ogan Komering Ulu Selatan", "Ogan Komering Ulu Timur", "Penukal Abab Lematang Ilir"],kota:["Lubuklinggau", "Pagar Alam", "Palembang", "Prabumulih"]},
+  "Bengkulu":{kab:["Bengkulu Selatan", "Bengkulu Tengah", "Bengkulu Utara", "Kaur", "Kepahiang", "Lebong", "Mukomuko", "Rejang Lebong", "Seluma"],kota:["Bengkulu"]},
+  "Lampung":{kab:["Lampung Barat", "Lampung Selatan", "Lampung Tengah", "Lampung Timur", "Lampung Utara", "Mesuji", "Pesawaran", "Pesisir Barat", "Pringsewu", "Tanggamus", "Tulang Bawang", "Tulang Bawang Barat", "Way Kanan"],kota:["Bandar Lampung", "Metro"]},
+  "Kepulauan Bangka Belitung":{kab:["Bangka", "Bangka Barat", "Bangka Selatan", "Bangka Tengah", "Belitung", "Belitung Timur"],kota:["Pangkal Pinang"]},
+  "Kepulauan Riau":{kab:["Bintan", "Karimun", "Kepulauan Anambas", "Lingga", "Natuna"],kota:["Batam", "Tanjung Pinang"]},
+  "DKI Jakarta":{kab:["Kepulauan Seribu"],kota:["Jakarta Barat", "Jakarta Pusat", "Jakarta Selatan", "Jakarta Timur", "Jakarta Utara"]},
+  "Jawa Barat":{kab:["Bandung", "Bandung Barat", "Bekasi", "Bogor", "Ciamis", "Cianjur", "Cirebon", "Garut", "Indramayu", "Karawang", "Kuningan", "Majalengka", "Pangandaran", "Purwakarta", "Subang", "Sukabumi", "Sumedang", "Tasikmalaya"],kota:["Bandung", "Banjar", "Bekasi", "Bogor", "Cimahi", "Cirebon", "Depok", "Sukabumi", "Tasikmalaya"]},
+  "Jawa Tengah":{kab:["Banjarnegara", "Banyumas", "Batang", "Blora", "Boyolali", "Brebes", "Cilacap", "Demak", "Grobogan", "Jepara", "Karanganyar", "Kebumen", "Kendal", "Klaten", "Kudus", "Magelang", "Pati", "Pekalongan", "Pemalang", "Purbalingga", "Purworejo", "Rembang", "Semarang", "Sragen", "Sukoharjo", "Tegal", "Temanggung", "Wonogiri", "Wonosobo"],kota:["Magelang", "Pekalongan", "Salatiga", "Semarang", "Surakarta", "Tegal"]},
+  "DI Yogyakarta":{kab:["Bantul", "Gunungkidul", "Kulon Progo", "Sleman"],kota:["Yogyakarta"]},
+  "Jawa Timur":{kab:["Bangkalan", "Banyuwangi", "Blitar", "Bojonegoro", "Bondowoso", "Gresik", "Jember", "Jombang", "Kediri", "Lamongan", "Lumajang", "Madiun", "Magetan", "Malang", "Mojokerto", "Nganjuk", "Ngawi", "Pacitan", "Pamekasan", "Pasuruan", "Ponorogo", "Probolinggo", "Sampang", "Sidoarjo", "Situbondo", "Sumenep", "Trenggalek", "Tuban", "Tulungagung"],kota:["Batu", "Blitar", "Kediri", "Madiun", "Malang", "Mojokerto", "Pasuruan", "Probolinggo", "Surabaya"]},
+  "Banten":{kab:["Lebak", "Pandeglang", "Serang", "Tangerang"],kota:["Cilegon", "Serang", "Tangerang", "Tangerang Selatan"]},
+  "Bali":{kab:["Badung", "Bangli", "Buleleng", "Gianyar", "Jembrana", "Karangasem", "Klungkung", "Tabanan"],kota:["Denpasar"]},
+  "Nusa Tenggara Barat":{kab:["Bima", "Dompu", "Lombok Barat", "Lombok Tengah", "Lombok Timur", "Lombok Utara", "Sumbawa", "Sumbawa Barat"],kota:["Bima", "Mataram"]},
+  "Nusa Tenggara Timur":{kab:["Alor", "Belu", "Ende", "Flores Timur", "Kupang", "Lembata", "Malaka", "Manggarai", "Manggarai Barat", "Manggarai Timur", "Nagekeo", "Ngada", "Rote Ndao", "Sabu Raijua", "Sikka", "Sumba Barat", "Sumba Barat Daya", "Sumba Tengah", "Sumba Timur", "Timor Tengah Selatan", "Timor Tengah Utara"],kota:["Kupang"]},
+  "Kalimantan Barat":{kab:["Bengkayang", "Kapuas Hulu", "Kayong Utara", "Ketapang", "Kubu Raya", "Landak", "Melawi", "Mempawah", "Sambas", "Sanggau", "Sekadau", "Sintang"],kota:["Pontianak", "Singkawang"]},
+  "Kalimantan Tengah":{kab:["Barito Selatan", "Barito Timur", "Barito Utara", "Gunung Mas", "Kapuas", "Katingan", "Kotawaringin Barat", "Kotawaringin Timur", "Lamandau", "Murung Raya", "Pulang Pisau", "Seruyan", "Sukamara"],kota:["Palangka Raya"]},
+  "Kalimantan Selatan":{kab:["Balangan", "Banjar", "Barito Kuala", "Hulu Sungai Selatan", "Hulu Sungai Tengah", "Hulu Sungai Utara", "Kotabaru", "Tabalong", "Tanah Bumbu", "Tanah Laut", "Tapin"],kota:["Banjarbaru", "Banjarmasin"]},
+  "Kalimantan Timur":{kab:["Berau", "Kutai Barat", "Kutai Kartanegara", "Kutai Timur", "Mahakam Ulu", "Paser", "Penajam Paser Utara"],kota:["Balikpapan", "Bontang", "Samarinda"]},
+  "Kalimantan Utara":{kab:["Bulungan", "Malinau", "Nunukan", "Tana Tidung"],kota:["Tarakan"]},
+  "Sulawesi Utara":{kab:["Bolaang Mongondow", "Bolaang Mongondow Selatan", "Bolaang Mongondow Timur", "Bolaang Mongondow Utara", "Kepulauan Sangihe", "Kepulauan Siau Tagulandang Biaro", "Kepulauan Talaud", "Minahasa", "Minahasa Selatan", "Minahasa Tenggara", "Minahasa Utara"],kota:["Bitung", "Kotamobagu", "Manado", "Tomohon"]},
+  "Sulawesi Tengah":{kab:["Banggai", "Banggai Kepulauan", "Banggai Laut", "Buol", "Donggala", "Morowali", "Morowali Utara", "Parigi Moutong", "Poso", "Sigi", "Tojo Una-Una", "Tolitoli"],kota:["Palu"]},
+  "Sulawesi Selatan":{kab:["Bantaeng", "Barru", "Bone", "Bulukumba", "Enrekang", "Gowa", "Jeneponto", "Kepulauan Selayar", "Luwu", "Luwu Timur", "Luwu Utara", "Maros", "Pangkajene dan Kepulauan", "Pinrang", "Sidenreng Rappang", "Sinjai", "Soppeng", "Takalar", "Tana Toraja", "Toraja Utara", "Wajo"],kota:["Makassar", "Palopo", "Parepare"]},
+  "Sulawesi Tenggara":{kab:["Bombana", "Buton", "Buton Selatan", "Buton Tengah", "Buton Utara", "Kolaka", "Kolaka Timur", "Kolaka Utara", "Konawe", "Konawe Kepulauan", "Konawe Selatan", "Konawe Utara", "Muna", "Muna Barat", "Wakatobi"],kota:["Baubau", "Kendari"]},
+  "Gorontalo":{kab:["Boalemo", "Bone Bolango", "Gorontalo", "Gorontalo Utara", "Pohuwato"],kota:["Gorontalo"]},
+  "Sulawesi Barat":{kab:["Majene", "Mamasa", "Mamuju", "Mamuju Tengah", "Pasangkayu", "Polewali Mandar"],kota:[]},
+  "Maluku":{kab:["Buru", "Buru Selatan", "Kepulauan Aru", "Kepulauan Tanimbar", "Maluku Barat Daya", "Maluku Tengah", "Maluku Tenggara", "Seram Bagian Barat", "Seram Bagian Timur"],kota:["Ambon", "Tual"]},
+  "Maluku Utara":{kab:["Halmahera Barat", "Halmahera Selatan", "Halmahera Tengah", "Halmahera Timur", "Halmahera Utara", "Kepulauan Sula", "Pulau Morotai", "Pulau Taliabu"],kota:["Ternate", "Tidore Kepulauan"]},
+  "Papua Barat":{kab:["Fakfak", "Kaimana", "Manokwari", "Manokwari Selatan", "Pegunungan Arfak", "Teluk Bintuni", "Teluk Wondama"],kota:[]},
+  "Papua Barat Daya":{kab:["Maybrat", "Raja Ampat", "Sorong", "Sorong Selatan", "Tambrauw"],kota:["Sorong"]},
+  "Papua":{kab:["Biak Numfor", "Jayapura", "Keerom", "Kepulauan Yapen", "Mamberamo Raya", "Sarmi", "Supiori", "Waropen"],kota:["Jayapura"]},
+  "Papua Selatan":{kab:["Asmat", "Boven Digoel", "Mappi", "Merauke"],kota:[]},
+  "Papua Tengah":{kab:["Deiyai", "Dogiyai", "Intan Jaya", "Mimika", "Nabire", "Paniai", "Puncak", "Puncak Jaya"],kota:[]},
+  "Papua Pegunungan":{kab:["Jayawijaya", "Lanny Jaya", "Mamberamo Tengah", "Nduga", "Pegunungan Bintang", "Tolikara", "Yahukimo", "Yalimo"],kota:[]}
+};
+const regLabels = p => WILAYAH[p] ? [...WILAYAH[p].kab.map(n=>"Kab. "+n), ...WILAYAH[p].kota.map(n=>"Kota "+n)] : [];
+function fillProv(sel,first){sel.innerHTML="";sel.add(new Option(first,""));Object.keys(WILAYAH).forEach(p=>sel.add(new Option(p,p)));}
+function fillReg(sel,prov,first){sel.innerHTML="";sel.add(new Option(first,""));regLabels(prov).forEach(r=>sel.add(new Option(r,r)));sel.disabled=!prov;}
+const canonProv = l => {const i=String(l).lastIndexOf(", ");if(i<0)return null;const p=l.slice(i+2);return WILAYAH[p]?p:null;};
+const shortLoc = l => canonProv(l) ? l.slice(0,l.lastIndexOf(", ")) : l;
+// Iklan lama dengan lokasi ketikan bebas (mis. "kota jogja") dicocokkan secara longgar
+const normLoc = s => String(s).toLowerCase().replace(/\b(jogja|jogjakarta|yogya|jogya)\b/g,"yogyakarta").replace(/\b(kab|kabupaten|kota)\b\.?/g," ").replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+function locMatch(ad,prov,reg){
+  const cp=canonProv(ad.location);
+  if(cp){ if(cp!==prov) return false; return !reg || ad.location===reg+", "+prov; }
+  const l=" "+normLoc(ad.location)+" ";
+  if(reg) return l.includes(" "+normLoc(reg)+" ");
+  return regLabels(prov).some(r=>l.includes(" "+normLoc(r)+" "));
+}
+const money = n => n == null || Number(n) === 0 ? "Gratis / Hubungi" : "Rp" + Number(n).toLocaleString("id-ID");
     const escapeHTML = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
     const emojiFor = category => ({"Kendaraan":"🚗","Properti":"🏡","Elektronik":"📱","Rumah Tangga":"🪑","Jasa":"🧰","Lowongan Kerja":"💼","Lainnya":"📦"}[category] || "📦");
     function supaHeaders(extra={}) { return {"apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY,"Content-Type":"application/json",...extra}; }
@@ -409,7 +465,7 @@
         count.textContent = "Gagal memuat";
       }
     }
-    const PAGE=12, KNOWN_LOC=["yogyakarta","bantul","sleman","jakarta","bandung","surabaya"];
+    const PAGE=12;
     let shown=PAGE, visibleAds=[];
     function timeAgo(d){const m=Math.floor((Date.now()-new Date(d))/6e4);if(m<1)return"Baru saja";if(m<60)return m+" menit lalu";const h=Math.floor(m/60);if(h<24)return h+" jam lalu";return Math.floor(h/24)+" hari lalu";}
     function normWA(v){let d=String(v||"").replace(/\D/g,"");if(d.startsWith("0"))d="62"+d.slice(1);else if(d.startsWith("8"))d="62"+d;return d;}
@@ -418,11 +474,10 @@
     const pv = a => Number(a.price) > 0 ? Number(a.price) : null;
     const byPrice = dir => (a,b)=>{const x=pv(a),y=pv(b);if(x===null&&y===null)return 0;if(x===null)return 1;if(y===null)return -1;return dir*(x-y);};
     function draw(){
-      const f=locationFilter.value.toLowerCase();
+      const fp=provFilter.value, fk=kabFilter.value;
       let ads=liveAds.filter(ad=>{
-        const loc=ad.location.toLowerCase();
         const hay=`${ad.title} ${ad.category} ${ad.location} ${ad.description} ${ad.seller_name}`.toLowerCase();
-        const locOk=!f||(f==="lainnya"?!KNOWN_LOC.some(k=>loc.includes(k)):loc.includes(f));
+        const locOk=!fp||locMatch(ad,fp,fk);
         return (activeCategory==="Semua"||ad.category===activeCategory)&&(!searchTerm||searchTerm.split(/\s+/).every(w=>hay.includes(w)))&&locOk;
       });
       if(sortFilter.value==="low")ads.sort(byPrice(1));
@@ -438,7 +493,7 @@
           <div class="listing-body">
             <div class="listing-title">${escapeHTML(ad.title)}</div>
             <div class="price">${money(ad.price)}</div>
-            <div class="listing-meta"><span>📍 ${escapeHTML(ad.location)}</span><span>${timeAgo(ad.created_at)}</span></div>
+            <div class="listing-meta"><span>📍 ${escapeHTML(shortLoc(ad.location))}</span><span>${timeAgo(ad.created_at)}</span></div>
             <button class="btn btn-light" data-details="${escapeHTML(ad.id)}">Lihat detail</button>
           </div></article>`;}).join("")
         +(ads.length>shown?'<div class="more" style="grid-column:1/-1"><button class="btn btn-outline" id="moreBtn">Tampilkan lebih banyak ↓</button></div>'
@@ -516,8 +571,9 @@
     });
     let searchTimer;$("searchInput").addEventListener("input",e=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{searchTerm=e.target.value.trim().toLowerCase();renderListings();},250);});
     $("searchForm").addEventListener("submit",e=>{e.preventDefault();searchTerm=$("searchInput").value.trim().toLowerCase();renderListings();scrollToList();});
-    locationFilter.addEventListener("change",renderListings);sortFilter.addEventListener("change",renderListings);
-    $("clearFilters").addEventListener("click",()=>{searchTerm="";$("searchInput").value="";locationFilter.value="";sortFilter.value="new";setActiveCat("Semua");renderListings();});
+    provFilter.addEventListener("change",()=>{fillReg(kabFilter,provFilter.value,"Semua kab./kota");renderListings();});
+    kabFilter.addEventListener("change",renderListings);sortFilter.addEventListener("change",renderListings);
+    $("clearFilters").addEventListener("click",()=>{searchTerm="";$("searchInput").value="";provFilter.value="";fillReg(kabFilter,"","Semua kab./kota");sortFilter.value="new";setActiveCat("Semua");renderListings();});
 
     // ---------- Form pasang / edit iklan ----------
     const modal=$("adModal");
@@ -537,6 +593,16 @@
     ["openAdTop","openAdHero","openAdBottom"].forEach(id=>$(id).addEventListener("click",openModal));
     ["closeModal","cancelModal"].forEach(id=>$(id).addEventListener("click",closeModal));
     modal.addEventListener("click",e=>{if(e.target===modal)closeModal();});
+    fillProv(provFilter,"Semua provinsi");fillReg(kabFilter,"","Semua kab./kota");
+    fillProv($("adProv"),"Pilih provinsi");fillReg($("adKab"),"","Pilih kabupaten/kota");
+    $("adProv").addEventListener("change",()=>fillReg($("adKab"),$("adProv").value,"Pilih kabupaten/kota"));
+    $("adForm").addEventListener("reset",()=>setTimeout(()=>fillReg($("adKab"),"","Pilih kabupaten/kota"),0));
+    function prefillLocation(loc){
+      const prov=canonProv(loc);
+      if(prov){const reg=loc.slice(0,loc.lastIndexOf(", "));if(regLabels(prov).includes(reg)){$("adProv").value=prov;fillReg($("adKab"),prov,"Pilih kabupaten/kota");$("adKab").value=reg;return;}}
+      $("adProv").value="";fillReg($("adKab"),"","Pilih kabupaten/kota");
+      showToast('Lokasi lama "'+loc+'" perlu dipilih ulang dari daftar.');
+    }
     const descEl=$("adDescription");
     descEl.addEventListener("input",()=>$("descCount").textContent=descEl.value.length+"/1000");
 
@@ -564,7 +630,7 @@
       if(!currentAd)return;const ad=currentAd,code=await getCode(ad);if(!code)return;
       closeDetail();openModal();editing={ad,code};setMode(true);
       const set=(id,v)=>$(id).value=v??"";
-      set("adTitle",ad.title);set("adCategory",ad.category);set("adPrice",ad.price);set("adLocation",ad.location);set("adContact",ad.whatsapp);set("adDescription",ad.description);set("adName",ad.seller_name);
+      set("adTitle",ad.title);set("adCategory",ad.category);set("adPrice",ad.price);prefillLocation(ad.location);set("adContact",ad.whatsapp);set("adDescription",ad.description);set("adName",ad.seller_name);
       $("descCount").textContent=ad.description.length+"/1000";
     });
     $("delBtn").addEventListener("click",async()=>{
@@ -591,9 +657,9 @@
       }
       const wa=normWA($("adContact").value);
       if(!/^62[0-9]{8,13}$/.test(wa)){showToast("Nomor WhatsApp tidak valid. Contoh: 08123456789");return;}
-      const data={title:$("adTitle").value.trim(),category:$("adCategory").value,location:$("adLocation").value.trim(),whatsapp:wa,description:descEl.value.trim(),seller_name:$("adName").value.trim()};
+      const data={title:$("adTitle").value.trim(),category:$("adCategory").value,location:$("adKab").value&&$("adProv").value?$("adKab").value+", "+$("adProv").value:"",whatsapp:wa,description:descEl.value.trim(),seller_name:$("adName").value.trim()};
       if(data.title.length<3){showToast("Judul minimal 3 huruf.");return;}
-      if(data.location.length<2){showToast("Lokasi minimal 2 huruf.");return;}
+      if(!$("adProv").value||!regLabels($("adProv").value).includes($("adKab").value)){showToast("Pilih provinsi dan kabupaten/kota dari daftar.");return;}
       if(data.seller_name.length<2){showToast("Nama pengiklan minimal 2 huruf.");return;}
       if(data.description.length<5){showToast("Deskripsi minimal 5 karakter.");return;}
       const priceInput=$("adPrice").value;
@@ -659,7 +725,7 @@
       const sec=$("latestSec"),box=$("latestStrip");
       const ads=[...liveAds].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,10);
       sec.hidden=!ads.length;
-      box.innerHTML=ads.map(ad=>`<button class="mini" data-latest="${escapeHTML(ad.id)}"><div class="mini-emoji">${emojiFor(ad.category)}</div><div class="mini-title">${escapeHTML(ad.title)}</div><div class="price" style="font-size:14px;margin:4px 0">${money(ad.price)}</div><div class="listing-meta"><span>📍 ${escapeHTML(ad.location)}</span></div></button>`).join("");
+      box.innerHTML=ads.map(ad=>`<button class="mini" data-latest="${escapeHTML(ad.id)}"><div class="mini-emoji">${emojiFor(ad.category)}</div><div class="mini-title">${escapeHTML(ad.title)}</div><div class="price" style="font-size:14px;margin:4px 0">${money(ad.price)}</div><div class="listing-meta"><span>📍 ${escapeHTML(shortLoc(ad.location))}</span></div></button>`).join("");
     }
     $("latestStrip").addEventListener("click",e=>{const b=e.target.closest("[data-latest]");if(b)openDetail(b.dataset.latest);});
     (function(){
